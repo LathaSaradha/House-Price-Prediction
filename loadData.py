@@ -32,7 +32,7 @@ class loadData:
     def load_file(self,all_files):
         #all_files = glob.glob(os.path.join(path, "*.csv"))  # advisable to use os.path.join as this makes concatenation OS independent
 
-        df_from_each_file = (pd.read_csv(f) for f in all_files)
+        df_from_each_file = (pd.read_csv(f,index_col=False) for f in all_files)
         concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
         print(concatenated_df.shape)
         print(concatenated_df.head())
@@ -40,7 +40,7 @@ class loadData:
 
     def create_csv(self,concatenated_df):
         print("copying the dataframe to a new csv file")
-        concatenated_df.to_csv(path+"combined.csv")
+        concatenated_df.to_csv(path+"combined.csv",index=False)
 
 
 def main():
