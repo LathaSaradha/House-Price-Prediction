@@ -49,6 +49,7 @@ def main():
     obj.set_dir(path)
     txt=obj.get_files()
     print(txt)
+    print()
     concatenated_df=obj.load_file(txt)
     obj.create_csv(concatenated_df)
 
