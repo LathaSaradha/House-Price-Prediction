@@ -281,6 +281,7 @@ class cleanData:
         print('Unique num of BATHS in new_df_with_sqft_value')
         print(list(new_df_with_sqft_value['BATHS'].unique()))
         print('Unique num of BATHS in new_df_with_sqft_na')
+
         print(list(new_df_with_sqft_na['BATHS'].unique()).sort())
 
 
