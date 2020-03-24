@@ -196,6 +196,7 @@ class cleanData:
         print(self.df_combined_file.columns)
         col_to_drop=['SALE_TYPE','SOLD_DATE','ADDRESS','DAYS_ON_MARKET','NEXT_OPEN_HOUSE_START_TIME','INTERESTED','FAVORITE','SOURCE','MLS#','SOURCE','LOT_SIZE','$/SQUARE_FEET','HOA/MONTH', 'STATUS', 'j','NEXT_OPEN_HOUSE_END_TIME','_']
         self.df_combined_file=self.df_combined_file.drop(labels=col_to_drop,axis=1)
+        self.df_combined_file = self.df_combined_file.reset_index(drop=True)
 
         # commented to reduce prints
         '''
@@ -209,6 +210,7 @@ class cleanData:
         print('Before removing duplicates')
         print(self.df_combined_file.shape)
         self.df_combined_file.drop_duplicates(keep='first',inplace=True,ignore_index=True)
+        self.df_combined_file = self.df_combined_file.reset_index(drop=True)
         print('After removing duplicates')
         print(self.df_combined_file.shape)
 
@@ -230,6 +232,7 @@ class cleanData:
         print('After checking BATHS')
         print(list(self.df_combined_file['BATHS'].unique()))
         self.df_combined_file = self.df_combined_file[~self.df_combined_file.BATHS.isna()]
+        self.df_combined_file = self.df_combined_file.reset_index(drop=True)
         print(self.df_combined_file.shape)
         # commented to reduce prints
         '''
@@ -267,6 +270,8 @@ class cleanData:
         temp_df = new_df_with_sqft_value[['BEDS', 'BATHS','SQUARE_FEET']]
 
         corr = temp_df.corr()
+        # commented to reduce prints
+        '''
         print(corr)
 
         print('Unique num of beds in self.df_combined_file')
@@ -281,11 +286,50 @@ class cleanData:
         print('Unique num of BATHS in new_df_with_sqft_value')
         print(list(new_df_with_sqft_value['BATHS'].unique()))
         print('Unique num of BATHS in new_df_with_sqft_na')
+        list1=list(new_df_with_sqft_na['BATHS'].unique())
+        print(list1.sort(reverse=True))
+        '''
 
-        print(list(new_df_with_sqft_na['BATHS'].unique()).sort())
 
+        temp= self.df_combined_file[['BEDS', 'BATHS','SQUARE_FEET']]
 
-        # find the mean sqft value of
+        # commented to reduce prints
+        '''
+        print(temp.shape)
+        print(temp)
+        '''
+        new_temp= self.df_combined_file[['BEDS', 'BATHS','SQUARE_FEET']]
+
+        #new_temp['SQUARE_FEET'].fillna(temp.groupby(['BEDS', 'BATHS'])['SQUARE_FEET'].transform('mean'))
+        self.df_combined_file['SQUARE_FEET']=temp.groupby(['BEDS', 'BATHS'])['SQUARE_FEET'].transform(lambda x: x.fillna(x.mean()))
+
+        # commented to reduce prints
+        '''
+        print('After changing')
+
+        print(self.df_combined_file.shape)
+        print(self.df_combined_file)
+
+        '''
+
+        # Removing rows with sqft is na
+        self.df_combined_file = self.df_combined_file[~self.df_combined_file.SQUARE_FEET.isna()]
+        self.df_combined_file = self.df_combined_file.reset_index(drop=True)
+
+        # commented to reduce prints
+        '''
+        print('sqft without value')
+        print(self.df_combined_file .shape)
+        print(self.df_combined_file)
+        '''
+
+    def create_csv(self):
+        print("copying the dataframe to a new csv file")
+        print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
+        print((len
+               (list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
+               ))
+        #self.df_combined_file.to_csv(path+"cleanedData.csv",index=False)
 
 def main():
     print("inside Main")
@@ -302,6 +346,7 @@ def main():
     obj.remove_duplicates()
     obj.beds_Baths()
     obj.clean_sqft()
+    obj.create_csv()
 
 if __name__ == '__main__':
     main()
