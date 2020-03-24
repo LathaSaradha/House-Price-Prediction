@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from geopy.extra.rate_limiter import RateLimiter
 
+
 from geopy import Nominatim
 
 path = 'C:/Users/Latha/Desktop/LATHA/Northeastern Illinois U/Masters Project/Data/Additional Data/'
