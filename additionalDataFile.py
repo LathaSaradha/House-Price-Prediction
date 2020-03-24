@@ -13,7 +13,6 @@ class additionalData:
         try:
             os.chdir(path)
             print("Directory changed")
-
         except OSError:
             print("Can't change the Current Working Directory")
 
