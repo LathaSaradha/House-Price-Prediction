@@ -65,7 +65,6 @@ class additionalData:
         self.df_combined_file['PCT']=0
         self.df_combined_file['Total_crimes']=0
 
-
         print("Finding the precinct for each house")
 
 
