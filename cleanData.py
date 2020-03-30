@@ -326,8 +326,7 @@ class cleanData:
     def create_csv(self):
         print("copying the dataframe to a new csv file")
         print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
-        print((len
-               (list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
+        print((len list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
                ))
         #self.df_combined_file.to_csv(path+"cleanedData.csv",index=False)
 
