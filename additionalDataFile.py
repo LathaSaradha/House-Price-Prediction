@@ -128,7 +128,6 @@ class additionalData:
         '''
         merged_inner = merged_inner[~merged_inner['2009-2010_OVERALL_GRADE'].isna()]
         merged_inner= merged_inner.reset_index(drop=True)
-
         print(merged_inner.shape)
         self.df_combined_school_data=merged_inner
 
