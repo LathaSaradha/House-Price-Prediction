@@ -323,12 +323,26 @@ class cleanData:
         print(self.df_combined_file)
         '''
 
+
+    def clean_ZipCode(self):
+        print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
+        print((len(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
+               ))
+        options = ['112229', '123456','0']
+
+        #temp = self.df_combined_file[self.df_combined_file['ZIP_OR_POSTAL_CODE'].isin(options)]
+
+        self.df_combined_file= self.df_combined_file[~(self.df_combined_file['ZIP_OR_POSTAL_CODE'].str.len() !=5)]
+        self.df_combined_file = self.df_combined_file.reset_index(drop=True)
+
+        print(self.df_combined_file)
+
     def create_csv(self):
         print("copying the dataframe to a new csv file")
         print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
-        print((len list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
-               ))
-        #self.df_combined_file.to_csv(path+"cleanedData.csv",index=False)
+
+
+        self.df_combined_file.to_csv(path+"cleanedData.csv",index=False)
 
 def main():
     print("inside Main")
@@ -345,6 +359,7 @@ def main():
     obj.remove_duplicates()
     obj.beds_Baths()
     obj.clean_sqft()
+    obj.clean_ZipCode()
     obj.create_csv()
 
 if __name__ == '__main__':
