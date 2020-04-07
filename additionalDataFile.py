@@ -22,6 +22,7 @@ class additionalData:
         df_school_location={}
         df_combined_school_data={}
         df_complaints_data={}
+        df_population={}
 
     def set_dir(self,path):
         try:
@@ -81,6 +82,64 @@ class additionalData:
         print(self.df_school_location.shape)
         print(self.df_school_location.columns)
         '''
+    def load_population_data(self,population_file_name):
+        print('Reading', population_file_name)
+        self.df_population = (pd.read_csv(path + population_file_name, index_col=False))
+        self.df_population.columns = [column.replace(" ", "_") for column in self.df_population.columns]
+
+        # commented to reduce prints
+        '''
+        print(self.df_population)
+        print(self.df_population.shape)
+        print(self.df_population.columns)
+        '''
+
+    def load_hospital_data(self, hospital_file_name):
+        print('Reading', hospital_file_name)
+        self.df_hospital = (pd.read_csv(path + hospital_file_name, index_col=False))
+        self.df_hospital.columns = [column.replace(" ", "_") for column in self.df_hospital.columns]
+
+        # commented to reduce prints
+        '''
+        print(self.df_hospital)
+        print(self.df_hospital.shape)
+        print(self.df_hospital.columns)
+        '''
+
+    def clean_hospital_data(self):
+        #self.df_hospital['DBN'] = self.df_hospital['DBN'].str.strip()
+        col_to_drop = ['Cross_Streets', 'Phone', 'Location_1', 'Postcode', 'Community_Board', 'Council_District', 'Census_Tract', 'BIN', 'BBL', 'NTA']
+        self.df_hospital = self.df_hospital.drop(labels=col_to_drop, axis=1)
+        # commented to reduce prints
+        '''
+        print(self.df_hospital.shape)
+        print(self.df_hospital.columns)
+        '''
+    def find_num_of_healthcare_facilities(self):
+        print('Finding num of healthcare facilities ')
+        self.df_combined_file['Total_Num_ofHospitals'] = 0
+
+        # Find the number of complaints for each house
+        self.df_combined_file['Total_Num_ofHospitals'] = self.df_combined_file[['LATITUDE', 'LONGITUDE']].apply(
+            lambda row: self.haversine_np(row[1], row[0], self.df_hospital['Longitude'].values,
+                                          self.df_hospital['Latitude'].values, 5.0), axis=1)
+        print(' After applying')
+        print(self.df_combined_file.shape)
+
+        print(self.df_combined_file.columns)
+
+        # commented to reduce prints
+        '''
+            
+        print(self.df_hospital.shape)
+        print(self.df_hospital)
+        print(self.df_hospital.columns)
+        
+        '''
+
+        print("rows with 0 hospitals")
+        temp1 = self.df_combined_file.query('Total_Num_ofHospitals==0')
+        print(temp1)
 
 
     def clean_school_data(self):
@@ -178,7 +237,6 @@ class additionalData:
         temp1=self.df_combined_file.query('Total_Number_of_Schools==0')
         print(temp1)
 
-        self.correlation_plot_combined_file()
 
     def correlation_plot_combined_file(self):
         print(self.df_combined_file.columns)
@@ -299,7 +357,6 @@ class additionalData:
         temp1 = self.df_combined_file.query('Total_Num_ofComplaints==0')
         print(temp1)
 
-        self.correlation_plot_combined_file()
 
     def test(self):
         print('Finding num of complaints ')
@@ -319,6 +376,50 @@ class additionalData:
 
         print(total_num_of_complaints)
 
+    def clean_population_data(self):
+        # removing unwanted columns
+        self.df_population = self.df_population[['Zip_Code', 'Population', 'People_/_Sq._Mile']]
+        print("Printing Lines where values are N/A")
+      
+        temp=self.df_population.isnull()
+        print(temp)
+
+
+    def find_population_per_zipcode(self):
+
+        #Merging data from combined file and population file based on Zip code
+        merged_inner = pd.merge(left=self.df_combined_file, how='inner', right=self.df_population, left_on='ZIP_OR_POSTAL_CODE',
+                                right_on='Zip_Code')
+
+        col_to_drop = ['Zip_Code']
+        merged_inner = merged_inner.drop(labels=col_to_drop, axis=1)
+        #self.df_crime_file = self.df_crime_file.reset_index(drop=True)
+
+        self.df_combined_file=merged_inner
+
+        #changing the datatype of population and pop/sq mile
+
+        self.df_combined_file["Population"] = self.df_combined_file["Population"].str.replace(",", "").astype(float)
+
+        self.df_combined_file["People_/_Sq._Mile"] = self.df_combined_file["People_/_Sq._Mile"].str.replace(",", "")
+
+        self.df_combined_file=self.df_combined_file.rename(columns={"People_/_Sq._Mile": "People/Sq_Mile"})
+
+
+
+        #self.df_combined_file['People/Sq_Mile'] = self.df_combined_file['People/Sq_Mile'].str.strip()
+
+        self.df_combined_file["People/Sq_Mile"] = self.df_combined_file["People/Sq_Mile"].astype(float)
+
+        # commented to reduce prints
+        '''
+        print(self.df_combined_file.head())
+        
+        print(self.df_combined_file.info())
+        
+        '''
+
+
 def main():
     print("inside Main")
     obj = additionalData()
@@ -334,15 +435,31 @@ def main():
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
+    '''
+    These can be removed.
+    '''
     # Crime related with precints
-    # obj.clean_crime_file()
-    # obj.find_the_pct_for_each_house()
-    # obj.correlation_plot_combined_file()
+    obj.clean_crime_file()
+    obj.find_the_pct_for_each_house()
+    obj.correlation_plot_combined_file()
 
     # school related
-    # obj.loadSchoolData("School_Progress_Reports_-_All_Schools.csv","School_Locations.csv")
-    # obj.clean_school_data()
-    #obj.find_school_for_each_house()
+    obj.loadSchoolData("School_Progress_Reports_-_All_Schools.csv","School_Locations.csv")
+    obj.clean_school_data()
+    obj.find_school_for_each_house()
+
+    #population related
+    obj.load_population_data("New_York_City_Population_By_Neighborhood_Tabulation_Areas.csv")
+    obj.clean_population_data()
+    obj.find_population_per_zipcode()
+
+    #Hospital related data
+    obj.load_hospital_data("NYC_Health___Hospitals_patient_care_locations_-_2011.csv")
+    obj.clean_hospital_data()
+    obj.find_num_of_healthcare_facilities()
+
+    #Finding correlation
+    obj.correlation_plot_combined_file()
 
 if __name__ == '__main__':
     main()

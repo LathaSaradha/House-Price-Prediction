@@ -28,7 +28,9 @@ class cleanData:
         # commented to reduce prints
         '''
         print(list(self.df_combined_file.columns))
-        print(self.df_combined_file.isna)
+
+
+
         #print((self.df_combined_file.columns[self.df_combined_file.isna().any()]).count)
 
         # Printing those column names where there is atleast one missing value
@@ -328,13 +330,19 @@ class cleanData:
         print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
         print((len(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
                ))
-        options = ['112229', '123456','0']
+
 
         #temp = self.df_combined_file[self.df_combined_file['ZIP_OR_POSTAL_CODE'].isin(options)]
 
         self.df_combined_file= self.df_combined_file[~(self.df_combined_file['ZIP_OR_POSTAL_CODE'].str.len() !=5)]
         self.df_combined_file = self.df_combined_file.reset_index(drop=True)
-
+        '''
+        print('Zipcdes with no population data')
+        options = ['11690', '10080', '10313', '11351','11380'                 ]
+        temp = self.df_combined_file[self.df_combined_file['ZIP_OR_POSTAL_CODE'].isin(options)]
+        print(temp)
+        print(len(temp))
+        '''
         print(self.df_combined_file)
 
     def create_csv(self):
@@ -342,7 +350,7 @@ class cleanData:
         print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
 
 
-        self.df_combined_file.to_csv(path+"cleanedData.csv",index=False)
+        #self.df_combined_file.to_csv(path+"cleanedData.csv",index=False)
 
 def main():
     print("inside Main")
