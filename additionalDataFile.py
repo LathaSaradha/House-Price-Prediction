@@ -218,7 +218,6 @@ class additionalData:
                 dist=self.manhattan_distance(lat1,long1,lat2,long2)
                 if(dist<=min_dist):
                     temp=self.df_combined_school_data['2009-2010_OVERALL_GRADE'][x]
-
                     self.df_combined_file.loc[y, 'Total_Number_of_Schools'] += 1
                     if(temp=='A'):
                         self.df_combined_file.loc[y, 'Level_A_SchoolCount'] +=1
