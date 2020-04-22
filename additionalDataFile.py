@@ -704,8 +704,6 @@ def main():
     obj.load_subwayStations_data("NYC_Subway_Station.csv")
     obj.clean_subway_data()
     obj.find_num_of_subways_for_each_house()
-    
-
 
     #Retail Store Data
     obj.load_retail_store_data("Retail_Food_Stores.csv")
@@ -715,7 +713,7 @@ def main():
     obj.find_num_of_retail_stores_for_each_house()
     print("--- %s seconds for retail stores ---" % (time.time() - start_time))
 
-   
+
     # Finding correlation
     obj.correlation_plot_combined_file()
 
