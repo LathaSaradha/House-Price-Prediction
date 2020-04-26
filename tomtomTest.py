@@ -16,7 +16,6 @@ headers = {
     'content-type': "application/json",
     'accept': "application/json"
     }
-
 conn.request("POST", "/distance", payload, headers)
 
 res = conn.getresponse()
