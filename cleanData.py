@@ -348,9 +348,29 @@ class cleanData:
     def create_csv(self):
         print("copying the dataframe to a new csv file")
         print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
+        self.df_combined_file.to_csv(path+"cleanedData.csv",index=False)
 
+    def clean_City(self):
+        #print(data.dtypes)
+        #print(len(data.CITY.unique()))
+        self.df_combined_file['CITY'] = self.df_combined_file['CITY'].str.upper()
+        self.df_combined_file['CITY'] = self.df_combined_file['CITY'].dropna()
+        #print(data.CITY.unique())
+        self.df_combined_file['CITY numeric'] = self.df_combined_file['CITY'].apply(lambda r: self.findCharacterSum(r))
+        # print(data['new'])
+        #print(len(data['CITY numeric'].unique()))
+        #print(len(data.CITY.unique()))
 
-        #self.df_combined_file.to_csv(path+"cleanedData.csv",index=False)
+    def findCharacterSum(self, s):
+        sum = 0
+        if (type(s) != str):
+            return 0
+        # print(s)
+        # print(len(s))
+        for j in range(len(s)):
+            sum += ord(s[j])
+        # print(sum)
+        return sum
 
 def main():
     print("inside Main")
@@ -368,6 +388,7 @@ def main():
     obj.beds_Baths()
     obj.clean_sqft()
     obj.clean_ZipCode()
+    obj.clean_City()
     obj.create_csv()
 
 if __name__ == '__main__':

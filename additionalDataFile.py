@@ -4,6 +4,7 @@ import math
 import numpy as np
 import time
 
+
 import seaborn as sns
 sns.set(font_scale=0.5)
 import matplotlib.pyplot as plt
@@ -327,7 +328,10 @@ class additionalData:
         print(temp1)
         print(temp1.shape)
 
-        scatter_plot_price_school = self.df_combined_file.plot.scatter(x='PRICE', y='Total_Number_of_Schools')
+        X= self.df_combined_file['PRICE']
+        Y= self.df_combined_file['Total_Number_of_Schools']
+
+        scatter_plot_price_school = plt.scatter(x=X, y=Y)
         plt.show()
 
     def correlation_plot_combined_file(self):
@@ -646,12 +650,16 @@ class additionalData:
         print(self.df_combined_file.shape)
         print(self.df_combined_file)
 
+
+
+
 def main():
     print("inside Main")
     obj = additionalData()
     obj.set_dir(path)
 
     obj.loadRedFinData("cleanedData.csv")
+
 
 
     #Crime related with complaints
@@ -674,8 +682,6 @@ def main():
     obj.clean_crime_file()
     obj.find_the_pct_for_each_house()
    
-
-
 
     # school related
     obj.loadSchoolData("School_Progress_Reports_-_All_Schools.csv","School_Locations.csv")
@@ -712,7 +718,6 @@ def main():
     start_time = time.time()
     obj.find_num_of_retail_stores_for_each_house()
     print("--- %s seconds for retail stores ---" % (time.time() - start_time))
-
 
     # Finding correlation
     obj.correlation_plot_combined_file()
