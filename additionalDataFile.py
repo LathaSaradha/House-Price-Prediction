@@ -4,8 +4,8 @@ import math
 import numpy as np
 import time
 
-
 import seaborn as sns
+
 sns.set(font_scale=0.5)
 import matplotlib.pyplot as plt
 
@@ -47,6 +47,8 @@ class additionalData:
         print(self.df_combined_file.head())
         print(self.df_combined_file.shape)
         print(self.df_combined_file.columns)
+
+
 
     def loadCrimeData(self, filename):
         print('Reading', filename)
@@ -278,12 +280,12 @@ class additionalData:
 
         print(self.df_combined_school_data.shape)
 
-
     def find_school_for_each_house(self):
 
         print("Finding the school for each house")
 
-        self.df_combined_school_data['Num_ofComplaints'] = self.df_combined_school_data['Num_ofComplaints'].astype(float)
+        self.df_combined_school_data['Num_ofComplaints'] = self.df_combined_school_data['Num_ofComplaints'].astype(
+            float)
 
         # Introducing new columns for School Level Count and Total Count
         self.df_combined_file['Level_A_SchoolCount'] = 0
@@ -306,8 +308,8 @@ class additionalData:
                 if dist <= min_dist:
                     temp = self.df_combined_school_data['2009-2010_OVERALL_GRADE'][x]
                     self.df_combined_file.loc[y, 'Total_Number_of_Schools'] += 1
-                    count=self.df_combined_school_data['Num_ofComplaints'][x]
-                    self.df_combined_file.loc[y,'Num_Complaints_schools'] +=count
+                    count = self.df_combined_school_data['Num_ofComplaints'][x]
+                    self.df_combined_file.loc[y, 'Num_Complaints_schools'] += count
                     if temp == 'A':
                         self.df_combined_file.loc[y, 'Level_A_SchoolCount'] += 1
                     elif temp == 'B':
@@ -328,16 +330,17 @@ class additionalData:
         print(temp1)
         print(temp1.shape)
 
-        X= self.df_combined_file['PRICE']
-        Y= self.df_combined_file['Total_Number_of_Schools']
+        X = self.df_combined_file['PRICE']
+        Y = self.df_combined_file['Total_Number_of_Schools']
 
         scatter_plot_price_school = plt.scatter(x=X, y=Y)
-        plt.show()
+        # commented to avoid plot
+        #plt.show()
 
     def correlation_plot_combined_file(self):
         print(self.df_combined_file.columns)
         corr = self.df_combined_file.corr()
-        corr=corr.round(2)
+        corr = corr.round(2)
         print(corr)
         print(type(corr))
         # commented to reduce prints
@@ -348,7 +351,8 @@ class additionalData:
             cmap=sns.diverging_palette(20, 220, n=200),
             square=True
         )
-        plt.show()
+        # commented to avoid plot
+        #plt.show()
 
     def clean_crime_file(self):
         self.df_crime_file['Total_Crimes'] = self.df_crime_file['TOTAL_NON-SEVEN_MAJOR_FELONY_OFFENSES'] + \
@@ -402,8 +406,23 @@ class additionalData:
         r = 6373.0
         a = (np.sin(d_lat / 2.0)) ** 2 + np.cos(lat1) * np.cos(lat2) * (np.sin(d_lon / 2.0)) ** 2
         c = 2 * np.arcsin(np.sqrt(a))
-        total_distance = r * c *0.621371
+        total_distance = r * c * 0.621371
         return total_distance
+
+    def manhattan_distance_parallel(self, lon1, lat1, lon2, lat2):
+
+        lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = np.sin(dlat / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2.0) ** 2
+        c = 2 * np.arcsin(np.sqrt(a))
+        total_count = 0
+        km = 6367 * c
+        # print(type(km))
+        # converting to miles
+        km = km * 0.621371
+        count = np.amin(km)
+        return count
 
     def haversine_np(self, lon1, lat1, lon2, lat2, R):
         """
@@ -422,7 +441,7 @@ class additionalData:
         # print(type(km))
 
         # converting to miles
-        km=km*0.621371
+        km = km * 0.621371
         count = np.count_nonzero(km <= R)
         return count
 
@@ -518,11 +537,12 @@ class additionalData:
         print(self.df_combined_file.info())
         
         '''
+
     def create_csv(self):
         print("copying the dataframe to a new csv file")
-        #print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
+        # print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
 
-        self.df_combined_file.to_csv(path+"AdditionalDataAndHouseData.csv",index=False)
+        self.df_combined_file.to_csv(path + "AdditionalDataAndHouseData.csv", index=False)
 
     def load_school_safety_data(self, school_safety_filename):
         print('Reading', school_safety_filename)
@@ -535,9 +555,9 @@ class additionalData:
         print(self.df_school_safety.shape)
         print(self.df_school_safety.columns)
 
-
     def clean_school_safety_data(self):
-        self.df_school_safety=self.df_school_safety[['School_Year','Location_Name','Address', 'Borough','Latitude', 'Longitude']]
+        self.df_school_safety = self.df_school_safety[
+            ['School_Year', 'Location_Name', 'Address', 'Borough', 'Latitude', 'Longitude']]
 
         self.df_school_safety = self.df_school_safety[~self.df_school_safety['Latitude'].isna()]
 
@@ -550,11 +570,12 @@ class additionalData:
         print(self.df_school_safety.columns[self.df_school_safety.isna().any()].tolist())
 
     def find_school_safety_for_each_school(self):
-        self.df_combined_school_data['Num_ofComplaints']=0
+        self.df_combined_school_data['Num_ofComplaints'] = 0
 
         print('Finding safety')
 
-        self.df_combined_school_data['Num_ofComplaints'] = self.df_combined_school_data[['Latitude', 'Longitude']].apply(
+        self.df_combined_school_data['Num_ofComplaints'] = self.df_combined_school_data[
+            ['Latitude', 'Longitude']].apply(
             lambda row: self.haversine_np(row[1], row[0], self.df_school_safety['Longitude'].values,
                                           self.df_school_safety['Latitude'].values, 0.1), axis=1)
         print('After applying')
@@ -578,7 +599,6 @@ class additionalData:
         print(self.df_retail_store.shape)
         print(self.df_retail_store.columns)
 
-
     def clean_retail_store_data(self):
         self.df_retail_store['LatLong'] = self.df_retail_store['Location'].str.split('(').str[1]
         self.df_retail_store['LatLong'] = self.df_retail_store['LatLong'].str.strip()
@@ -601,6 +621,7 @@ class additionalData:
         print(self.df_retail_store.shape)
         print(self.df_retail_store)
 
+    # Old version of the method
     def find_num_of_retail_stores_for_each_house(self):
         print("find_num_of_retail_stores_for_each_house")
 
@@ -645,12 +666,107 @@ class additionalData:
             for x in range(self.df_retail_store.shape[0]):
                 zip_retail = self.df_retail_store['Zip_Code'][x]
                 if (zip == zip_retail):
-                    self.df_combined_file.loc[y,'Num_of_Retail_stores_Zipcode'] +=1
+                    self.df_combined_file.loc[y, 'Num_of_Retail_stores_Zipcode'] += 1
 
         print(self.df_combined_file.shape)
         print(self.df_combined_file)
 
+    def find_num_of_retail_stores_for_each_house_1(self):
+        print("find_num_of_retail_stores_for_each_house")
 
+        self.df_combined_file['Num_of_Retail_stores'] = 0
+        self.df_combined_file['min_dist_retail_store'] = 0
+        self.df_combined_file['Num_of_Retail_stores_Zipcode']=0
+
+        # Find the number of subway stations for each house
+        self.df_combined_file['Num_of_Retail_stores'] = self.df_combined_file[['LATITUDE', 'LONGITUDE']].apply(
+            lambda row: self.haversine_np(row[1], row[0], self.df_retail_store['Longitude'].values,
+                                          self.df_retail_store['Latitude'].values, 1.0), axis=1)
+
+        # commented to reduce prints
+        '''
+        print('After applying')
+        print(self.df_combined_file.shape)
+        print(self.df_combined_file)
+        '''
+
+        print("Finding min distance retailstore")
+
+        self.df_combined_file['min_dist_retail_store'] = self.df_combined_file[['LATITUDE', 'LONGITUDE']].apply(
+            lambda row: self.manhattan_distance_parallel(row[1], row[0], self.df_retail_store['Longitude'].values,
+                                                         self.df_retail_store['Latitude'].values), axis=1)
+        # commented to reduce prints
+        '''
+        print("Finding min distance retailstore")
+        print(self.df_combined_file.shape)
+        print(self.df_combined_file)
+
+        print("Find the num of retailers using zipcode")
+        '''
+        self.df_retail_store['Num_of_Retail_stores_Zipcode']=0
+        self.df_retail_store['Num_of_Retail_stores_Zipcode'] = self.df_retail_store.groupby('Zip_Code')[
+            'Zip_Code'].transform('count')
+
+        temp = self.df_retail_store.groupby(['Zip_Code']).count().reset_index()
+        # commented to reduce prints
+        '''
+        
+        print('sum is')
+        print(temp['Entity_Name'].sum())
+        print(temp)
+        print(type(temp))
+        print(temp.columns)
+
+        print(self.df_retail_store)
+        
+        print("temp")
+        print(temp.columns)
+        print(temp)
+
+        print("Values with null in temp")
+
+        cols = ['Zip_Code',  'Num_of_Retail_stores_Zipcode']
+        print(temp[temp["Num_of_Retail_stores_Zipcode"].isnull()][cols])
+
+        print("Values with null in temp 2")
+        print(temp.query('Zip_Code==11363'))
+        '''
+        merged_inner = pd.merge(left=self.df_combined_file, how='left', right=temp, left_on='ZIP_OR_POSTAL_CODE',
+                                right_on='Zip_Code')
+        merged_inner.drop_duplicates(keep='first', inplace=False, ignore_index=True)
+
+        print(merged_inner.columns)
+
+        col_to_drop = ['Entity_Name', 'Address_Line_3', 'Zip_Code', 'Location', 'Latitude', 'Longitude','Num_of_Retail_stores_Zipcode_x']
+
+        self.df_combined_file = merged_inner.drop(labels=col_to_drop, axis=1)
+
+        print(self.df_combined_file.columns)
+        self.df_combined_file = self.df_combined_file.rename(columns={"Num_of_Retail_stores_Zipcode_y": "Num_of_Retail_stores_Zipcode"})
+        self.df_combined_file = self.df_combined_file.reset_index(drop=True)
+        # commented to reduce prints
+        '''
+        print(self.df_retail_store.shape)
+
+        print(self.df_combined_file.shape)
+        print(self.df_combined_file)
+
+        print("Values with null")
+        null_columns = self.df_combined_file.columns[self.df_combined_file.isnull().any()]
+        cols = ['ZIP_OR_POSTAL_CODE', 'CITY', 'Num_of_Retail_stores_Zipcode']
+        print(self.df_combined_file[self.df_combined_file["Num_of_Retail_stores_Zipcode"].isnull()][cols])
+
+        print("Values with null after changing")
+        '''
+
+        # changing the columns with nan value with 0
+        self.df_combined_file['Num_of_Retail_stores_Zipcode'].fillna(0, inplace=True)
+
+        # commented to reduce prints
+        '''
+        print(self.df_combined_file[self.df_combined_file["Num_of_Retail_stores_Zipcode"].isnull()][cols])
+        print(self.df_combined_file.shape)
+        '''
 
 
 def main():
@@ -658,50 +774,38 @@ def main():
     obj = additionalData()
     obj.set_dir(path)
 
+    load_start_time = time.time()
+
     obj.loadRedFinData("cleanedData.csv")
 
-
-
-    #Crime related with complaints
+    # Crime related with complaints
     obj.loadComplaintData("NYPD_Complaint_Data_Current__Year_To_Date.csv")
     obj.clean_complaints_file()
     start_time = time.time()
     obj.find_num_ofComplaints_for_each_house()
-
     print("--- %s seconds ---" % (time.time() - start_time))
-
-
-
-
-    '''
-    These can be removed.
-    '''
 
     # Crime related with precints
     obj.loadCrimeData("cleanedDataCrimeFile.csv")
     obj.clean_crime_file()
     obj.find_the_pct_for_each_house()
-   
 
     # school related
-    obj.loadSchoolData("School_Progress_Reports_-_All_Schools.csv","School_Locations.csv")
+    obj.loadSchoolData("School_Progress_Reports_-_All_Schools.csv", "School_Locations.csv")
     obj.clean_school_data()
 
     # School safety Data
     obj.load_school_safety_data("2010_-_2016_School_Safety_Report.csv")
     obj.clean_school_safety_data()
     obj.find_school_safety_for_each_school()
-
-
     obj.find_school_for_each_house()
 
-
-    #population related
+    # population related
     obj.load_population_data("New_York_City_Population_By_Neighborhood_Tabulation_Areas.csv")
     obj.clean_population_data()
     obj.find_population_per_zipcode()
 
-    #Hospital related data
+    # Hospital related data
     obj.load_hospital_data("NYC_Health___Hospitals_patient_care_locations_-_2011.csv")
     obj.clean_hospital_data()
     obj.find_num_of_healthcare_facilities()
@@ -711,19 +815,20 @@ def main():
     obj.clean_subway_data()
     obj.find_num_of_subways_for_each_house()
 
-    #Retail Store Data
+
+    # Retail Store Data
     obj.load_retail_store_data("Retail_Food_Stores.csv")
     obj.clean_retail_store_data()
-
     start_time = time.time()
-    obj.find_num_of_retail_stores_for_each_house()
+    obj.find_num_of_retail_stores_for_each_house_1()
     print("--- %s seconds for retail stores ---" % (time.time() - start_time))
 
     # Finding correlation
     obj.correlation_plot_combined_file()
 
-    #Create csv file
+    # Create csv file
     obj.create_csv()
+    print("--- %s seconds Total time ---" % (time.time() - load_start_time))
 
 
 if __name__ == '__main__':

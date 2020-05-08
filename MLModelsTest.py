@@ -17,16 +17,15 @@ class MLModels:
     pd.set_option('display.max_rows', 500)
     pd.set_option('display.max_columns', 500)
     pd.set_option('display.width', 2000)
+    params = {'legend.fontsize': 10,
+              'legend.handlelength': 1}
+    plt.rcParams.update(params)
 
+    def __init__(self):
+        self.df_add_house_data_file={}
+        #self.df_ML_errors={}
+        self.df_ML_errors=pd.DataFrame(columns=["Method","R^2","Adjusted R^2","MAE","MSE","RMSE"])
 
-    # def __init__(self):
-    #     df_crime_file = {}
-    #     df_combined_file = {}
-    #     df_school_rating={}
-    #     df_school_location={}
-    #     df_combined_school_data={}
-    #     df_complaints_data={}
-    #     df_population={}
 
     def set_dir(self, path):
         try:
@@ -46,12 +45,20 @@ class MLModels:
         print('Reading', filename)
         self.df_add_house_data_file = (pd.read_csv(path + filename, index_col=False))
 
+        self.df_add_house_data_file = self.df_add_house_data_file[~self.df_add_house_data_file.isna()]
+
         print(self.df_add_house_data_file.head())
         print(self.df_add_house_data_file.shape)
         print(self.df_add_house_data_file.columns)
 
-    def LinearRegression1(self,  X_train, X_test, Y_train, Y_test,list_of_columns):
+        print("Values with null")
+        null_columns=self.df_add_house_data_file.columns[self.df_add_house_data_file.isnull().any()]
+        cols=['ZIP_OR_POSTAL_CODE','CITY','Num_of_Retail_stores_Zipcode']
+        print(self.df_add_house_data_file[self.df_add_house_data_file["Num_of_Retail_stores_Zipcode"].isnull()][cols])
 
+    def LinearRegression1(self,  X_train, X_test, Y_train, Y_test,list_of_columns):
+        print('---------------------------------------------')
+        print('LinearRegression1')
         # values converts it into a numpy array
         x_train = X_train[list_of_columns]
         x_test=X_test[list_of_columns]
@@ -71,14 +78,14 @@ class MLModels:
         print('Evaluation of Train Data')
         print('---------------------------------------------')
         y_pred_train = linear_regressor.predict(x_train)
-        self.FindErrors(x_train,y_train,y_pred_train)
+        self.FindErrors(x_train,y_train,y_pred_train,'Linear Regressor Train')
 
 
         print('---------------------------------------------')
         print('Evaluation of Test Data')
         y_test_pred = linear_regressor.predict(x_test)
         # Model Evaluation
-        self.FindErrors(x_test, y_test, y_test_pred)
+        self.FindErrors(x_test, y_test, y_test_pred,'Linear Regressor Test')
 
 
         plt.figure(figsize=(20, 20))
@@ -100,7 +107,7 @@ class MLModels:
         # Checking Normality of errors
         plt.subplot(223)
         self.histogram_Residuals(y_test - Y_pred)
-        plt.show()
+        #plt.show()
 
     def removePrice(self):
         X = self.df_add_house_data_file.drop(['PRICE'], axis=1)
@@ -117,14 +124,21 @@ class MLModels:
 
         return numericvals,Y
 
-    def FindErrors(self, x_value, y_value, y_value_pred):
+    def FindErrors(self, x_value, y_value, y_value_pred,method):
         acc_linreg = metrics.r2_score(y_value, y_value_pred)
+        adjusted_r2= 1 - (1 - metrics.r2_score(y_value, y_value_pred)) * (len(y_value) - 1) / (len(y_value) - x_value.shape[1] - 1)
+        mae=metrics.mean_absolute_error(y_value, y_value_pred)
+        mse=metrics.mean_squared_error(y_value, y_value_pred)
+        rmse=np.sqrt(metrics.mean_squared_error(y_value, y_value_pred))
+        #f1score=metrics.f1_score(y_value,y_value_pred)
         print('R^2:', acc_linreg)
-        print('Adjusted R^2:',
-              1 - (1 - metrics.r2_score(y_value, y_value_pred)) * (len(y_value) - 1) / (len(y_value) - x_value.shape[1] - 1))
-        print('MAE:', metrics.mean_absolute_error(y_value, y_value_pred))
-        print('MSE:', metrics.mean_squared_error(y_value, y_value_pred))
-        print('RMSE:', np.sqrt(metrics.mean_squared_error(y_value, y_value_pred)))
+        print('Adjusted R^2:',adjusted_r2 )
+        print('MAE:', mae)
+        print('MSE:', mse)
+        print('RMSE:',rmse )
+        print('Accuracy:  %.2f%%' % (acc_linreg*100.0))
+
+        self.df_ML_errors=self.df_ML_errors.append({'Method':method,'R^2':acc_linreg,'Adjusted R^2':adjusted_r2,'MAE':mae,'MSE':mse,'RMSE':rmse},ignore_index=True)
 
     def histogram_Residuals(self,axis):
         plt.hist(axis)
@@ -142,33 +156,42 @@ class MLModels:
         print('Evaluation of Train Data')
         y_train_pred = reg.predict(X_train)
 
-        self.FindErrors(X_train, Y_train, y_train_pred)
+        self.FindErrors(X_train, Y_train, y_train_pred,'Random Regressor train')
         print('---------------------------------------------')
         print('Evaluation of Test Data')
         y_test_pred = reg.predict(X_test)
+        # commented to reduce prints
+        '''
         print(Y_test)
         print(y_test_pred)
+        '''
 
-        self.FindErrors(X_test, Y_test, y_test_pred)
+        self.FindErrors(X_test, Y_test, y_test_pred,'Random Regressor test')
+
+
+        print('Confusion matrix ')
+        #temp=metrics.confusion_matrix(Y_test, y_test_pred, labels=None, sample_weight=None, normalize=None)
+       # print(temp)
 
     def XGBoost_Regressor(self, X_train, X_test, Y_train, Y_test):
         print('---------------------------------------------')
         print('XGBoost_Regressor')
-        reg = XGBRegressor()
+        reg = XGBRegressor(objective ='reg:squarederror',
+                           )
 
         # Train the model using the training sets
         reg.fit(X_train, Y_train)
         print('Evaluation of Train Data')
         y_train_pred = reg.predict(X_train)
-        self.FindErrors(X_train, Y_train, y_train_pred)
+        self.FindErrors(X_train, Y_train, y_train_pred,'XGBoost_Regressor train')
 
         print('---------------------------------------------')
         print('Evaluation of Test Data')
+
         y_test_pred = reg.predict(X_test)
-        self.FindErrors(X_test, Y_test, y_test_pred)
+        self.FindErrors(X_test, Y_test, y_test_pred,'XGBoost_Regressor test')
 
     def standardise_data(self):
-        print("Standardisation Step 1")
 
         numeric = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
 
@@ -181,7 +204,6 @@ class MLModels:
 
         # Standardising the data
         print('--------------------------------------------------------------------')
-        print("Standardisation Step 2")
 
         self.df_add_house_data_file = self.FindStandardizedDataset(numerical)
         print('--------------------------------------------------------------------')
@@ -192,7 +214,7 @@ class MLModels:
         to_drop2 = ['PRICE']
 
         print(self.df_add_house_data_file.columns)
-        # the place where warning comes
+
         self.df_add_house_data_file=self.df_add_house_data_file.drop(['PRICE'], axis=1)
 
         print(self.df_add_house_data_file.columns)
@@ -252,8 +274,16 @@ class MLModels:
             cmap=sns.diverging_palette(20, 220, n=200),
             square=True
         )
-        plt.show()
+        #plt.show()
         return corr
+
+    def print_ML_errors(self):
+        print(self.df_ML_errors)
+        print(self.df_ML_errors.shape)
+
+    def plot_ML_errors(self):
+        self.df_ML_errors.plot(x='Method')
+        plt.show()
 
 
 def main():
@@ -279,7 +309,11 @@ def main():
 
     obj.XGBoost_Regressor(X_train, X_test, Y_train, Y_test)
 
-    obj.RandomRegressor(X_train, X_test, Y_train, Y_test,)
+    obj.RandomRegressor(X_train, X_test, Y_train, Y_test)
+
+    obj.print_ML_errors()
+
+    obj.plot_ML_errors()
 
 
 
