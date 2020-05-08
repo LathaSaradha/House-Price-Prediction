@@ -315,7 +315,5 @@ def main():
 
     obj.plot_ML_errors()
 
-
-
 if __name__ == '__main__':
     main()
