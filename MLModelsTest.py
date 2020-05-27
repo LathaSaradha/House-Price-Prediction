@@ -475,7 +475,6 @@ def main():
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
 
     list_of_columns = X.columns
-
     obj.LinearRegression1(X_train, X_test, Y_train, Y_test, list_of_columns)
     obj.XGBoost_Regressor(X_train, X_test, Y_train, Y_test)
     obj.RandomRegressor(X_train, X_test, Y_train, Y_test)
