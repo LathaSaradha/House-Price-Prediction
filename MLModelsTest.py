@@ -499,7 +499,6 @@ class MLModels:
         # temp = X.iloc[0:rows, cols1 + cols2]
         #print(temp)
         #print(columns[cols1])
-
         rows = X.shape[0]
         cols = X.shape[1]
         listcolumns = X.columns
