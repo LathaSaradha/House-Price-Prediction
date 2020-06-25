@@ -279,7 +279,6 @@ class MLModels:
 
 
 
-
 def main():
     print("inside Main")
     obj = MLModels()
