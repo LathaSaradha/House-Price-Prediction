@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import metrics
 import seaborn as sns
+import time
+import math
 
 import statsmodels.api as sm
 import pylab as py
@@ -34,7 +36,7 @@ class MLModels:
         self.df_add_house_data_file = {}
         # self.df_ML_errors={}
         self.df_ML_errors = pd.DataFrame(columns=["Method", "R^2", "Adjusted R^2", "MAE", "MSE", "RMSE", "HuberLoss",
-                                                  "logcosh", "Percent_Error"])
+                                                  "logcosh", "Percent_Error","ColsList"        ])
 
     def set_dir(self, path):
         try:
@@ -69,9 +71,9 @@ class MLModels:
         data_points = self.df_add_house_data_file[['PRICE']]
 
         sm.qqplot(data_points, line='45')
-        py.show()
+        #py.show()
 
-    def LinearRegression1(self, X_train, X_test, Y_train, Y_test, list_of_columns):
+    def LinearRegression1(self, X_train, X_test, Y_train, Y_test, list_of_columns,colslist):
         print('---------------------------------------------')
         print('LinearRegression1')
         # values converts it into a numpy array
@@ -102,7 +104,7 @@ class MLModels:
         print('Evaluation of Test Data')
         y_test_pred = linear_regressor.predict(x_test)
         # Model Evaluation
-        self.FindErrors(x_test, y_test, y_test_pred, 'Linear Regressor')
+        self.FindErrors(x_test, y_test, y_test_pred, 'Linear Regressor',colslist)
 
         #
         # plt.figure(figsize=(20, 20))
@@ -139,19 +141,15 @@ class MLModels:
         Y = self.df_add_house_data_file['PRICE']
         print(Y.head)
 
+        self.df_add_house_data_file=numericvals
+
         return numericvals, Y
 
-    def FindErrors(self, x_value, y_value, y_value_pred, method):
+    def FindErrors(self, x_value, y_value, y_value_pred, method,colslist):
 
-        # plt.scatter(y_value, y_value_pred)
-        # plt.xlabel("Prices")
-        # plt.ylabel("Predicted prices")
-        # title="Prices vs Predicted prices - "+method
-        # plt.title(title)
-        # plt.show()
         acc_linreg = metrics.r2_score(y_value, y_value_pred)
-        adjusted_r2 = 1 - (1 - metrics.r2_score(y_value, y_value_pred)) * (len(y_value) - 1) / (
-                len(y_value) - x_value.shape[1] - 1)
+        adjusted_r2 = 1 - ((1 - (metrics.r2_score(y_value, y_value_pred) ** 2)) * (len(y_value) - 1) / (
+                len(y_value) - x_value.shape[1] - 1))
         mae = metrics.mean_absolute_error(y_value, y_value_pred)
         mse = metrics.mean_squared_error(y_value, y_value_pred)
         rmse = np.sqrt(metrics.mean_squared_error(y_value, y_value_pred))
@@ -165,15 +163,11 @@ class MLModels:
 
         percent = 15
 
-        #count_of_error_prediction = self.findpercentCount(y_value, y_value_pred, percent)
-
-        #percent_error = count_of_error_prediction / y_value_pred.shape[0]
-
-        #print('more than', percent, ' percent error:', percent_error, y_value_pred.shape[0])
-
         count_of_error_prediction = self.findpercentCountLog(y_value, y_value_pred, percent)
+        sigmoid_error = self.findpercentCountLog_Sigmoid(y_value, y_value_pred, percent)
 
         percent_error = count_of_error_prediction / y_value_pred.shape[0]
+        percent__sigmoid_error = sigmoid_error / y_value_pred.shape[0]
 
         print('more than', percent, ' percent error:', percent_error, y_value_pred.shape[0])
 
@@ -186,13 +180,15 @@ class MLModels:
         print('huberLoss:  ', huberLoss)
         print('logcosh: ', logcosh)
         print('Accuracy:  %.2f%%' % accuracy)
+        print('Sigmoid Error', percent__sigmoid_error)
 
         self.df_ML_errors = self.df_ML_errors.append(
-            {'Method': method, 'R^2': acc_linreg, 'Adjusted R^2': adjusted_r2, 'MAE': mae, 'MSE': mse, 'RMSE': rmse,
+            {'ColsList':colslist,'Method': method, 'R^2': acc_linreg, 'Adjusted R^2': adjusted_r2, 'MAE': mae, 'MSE': mse, 'RMSE': rmse,
              'Accuracy': accuracy, 'HuberLoss': huberLoss,
-             'logcosh': logcosh
-                ,
-             'Percent_Error': percent_error
+             'logcosh': logcosh    ,
+             'Percent_Error': percent_error,
+             'sigmoid % Error': percent__sigmoid_error
+
              },
             ignore_index=True)
 
@@ -206,27 +202,22 @@ class MLModels:
         loss = np.log(np.cosh(pred - true_value))
         return np.sum(loss)
 
-    def findpercentCount(self, true_value, pred, percent):
-        print("Finding percent count")
-        # commented to reduce prints
-        '''
-        print(true_value.shape)
-        print(true_value)
-        print(pred)
-        print(type(true_value))
-        print(type(pred))
 
-        print(type(true_value))
-        print(pred.shape[0])
-        '''
+    def findpercentCountLog_Sigmoid(self, true_value, pred, percent):
+        print("Finding percent count")
+
         true_value = true_value.to_numpy()
         print('converting to inverse standardisation')
         count = 0
         for row in range(pred.shape[0]):
             # print(row)
-            y_truevalue = (true_value[row] * self.std) + self.Mean
-            y_predvalue = (pred[row] * self.std) + self.Mean
+            y_truevalue = np.exp(true_value[row])
+            y_predvalue = np.exp(pred[row])
             # print(y_truevalue," ",y_predvalue,"  from ",true_value[row],"  ",pred[row])
+            ytemp=y_truevalue/1000000
+            percent=0.3*(math.exp(-ytemp))
+
+            percent=percent*100
             percentvalue = (y_truevalue * percent) / 100
 
             diff = abs(y_truevalue - y_predvalue)
@@ -241,7 +232,7 @@ class MLModels:
         plt.xlabel("Residuals")
         plt.ylabel("Frequency")
 
-    def RandomRegressor(self, X_train, X_test, Y_train, Y_test):
+    def RandomRegressor(self, X_train, X_test, Y_train, Y_test,colslist):
         print('---------------------------------------------')
         print('RandomRegressor')
         reg = RandomForestRegressor()
@@ -265,14 +256,14 @@ class MLModels:
         print(y_test_pred)
         '''
 
-        self.FindErrors(X_test, Y_test, y_test_pred, 'Random Regressor')
+        self.FindErrors(X_test, Y_test, y_test_pred, 'Random Regressor',colslist)
 
         print('Confusion matrix ')
         # temp=metrics.confusion_matrix(Y_test, y_test_pred, labels=None, sample_weight=None, normalize=None)
 
     # print(temp)
 
-    def MLPRegressor(self, X_train, X_test, Y_train, Y_test):
+    def MLPRegressor(self, X_train, X_test, Y_train, Y_test,colslist):
         print('---------------------------------------------')
         print('MLPRegressor')
         reg = MLPRegressor(random_state=1, max_iter=500).fit(X_train, Y_train)
@@ -295,7 +286,7 @@ class MLModels:
         print(y_test_pred)
         '''
 
-        self.FindErrors(X_test, Y_test, y_test_pred, 'MLPRegressor')
+        self.FindErrors(X_test, Y_test, y_test_pred, 'MLPRegressor',colslist)
 
         print('score')
         print(reg.score(X_test, Y_test))
@@ -303,7 +294,7 @@ class MLModels:
         print('Confusion matrix ')
         # temp=metrics.confusion_matrix(Y_test, y_test_pred, labels=None, sample_weight=None, normalize=None)
 
-    def XGBoost_Regressor(self, X_train, X_test, Y_train, Y_test):
+    def XGBoost_Regressor(self, X_train, X_test, Y_train, Y_test,colslist):
         print('---------------------------------------------')
         print('XGBoost_Regressor')
         reg = XGBRegressor(objective='reg:squarederror',
@@ -322,7 +313,7 @@ class MLModels:
         print('Evaluation of Test Data')
 
         y_test_pred = reg.predict(X_test)
-        self.FindErrors(X_test, Y_test, y_test_pred, 'XGBoost_Regressor')
+        self.FindErrors(X_test, Y_test, y_test_pred, 'XGBoost_Regressor',colslist)
         print('---------------------------------------------')
         print('Feature Importances')
         print(reg.feature_importances_)  # use inbuilt class feature_importances of tree based classifiers
@@ -330,9 +321,9 @@ class MLModels:
         feat_importances = pd.Series(reg.feature_importances_, index=X_train.columns)
         print(feat_importances.nlargest(10))
         feat_importances.nlargest(10).plot(kind='barh')
-        plt.show()
+        #plt.show()
 
-    def KNN(self, X_train, X_test, Y_train, Y_test):
+    def KNN(self, X_train, X_test, Y_train, Y_test,colslist):
         print('---------------------------------------------')
         print('knn')
         knn = KNeighborsRegressor(n_neighbors=6)
@@ -351,99 +342,10 @@ class MLModels:
         print('Evaluation of Test Data')
 
         y_test_pred = knn.predict(X_test)
-        self.FindErrors(X_test, Y_test, y_test_pred, 'knn')
+        self.FindErrors(X_test, Y_test, y_test_pred, 'knn',colslist)
         print('---------------------------------------------')
 
-    def standardise_data(self):
 
-        numeric = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-
-        numerical = self.df_add_house_data_file.select_dtypes(include=numeric)
-
-        print("Numeric columns are.....")
-
-        numerical = numerical.reset_index(drop=True)
-        print(numerical)
-
-        # Standardising the data
-        print('--------------------------------------------------------------------')
-
-        self.df_add_house_data_file = self.FindStandardizedDataset(numerical)
-        print('--------------------------------------------------------------------')
-        print('Correlation Matrix of Standardized Dataset')
-
-        Y = self.df_add_house_data_file['PRICE']
-
-        to_drop2 = ['PRICE']
-
-        print(self.df_add_house_data_file.columns)
-
-        self.df_add_house_data_file = self.df_add_house_data_file.drop(['PRICE'], axis=1)
-
-        print(self.df_add_house_data_file.columns)
-
-        corr__std_matrix = self.correlation_plot_combined_file()
-
-        print('Eigen value of Standardized Dataset')
-        self.calculationofEigenvalues(corr__std_matrix, self.df_add_house_data_file)
-
-        self.df_add_house_data_file['PRICE'] = Y
-
-    def FindStandardizedDataset(self, numericvals):
-
-        standardized_X = preprocessing.scale(numericvals)
-        # print(standardized_X)
-        # print(standardized_X.dtype)
-        print(numericvals.columns.values)
-
-        self.Mean = numericvals['PRICE'].mean()
-        print("mean is ", self.Mean)
-        self.std = np.std(numericvals['PRICE'])
-        print("STD is ", self.std)
-
-        print(standardized_X)
-
-        std = pd.DataFrame(data=standardized_X, columns=numericvals.columns.values)
-        print(std)
-        return std
-
-    def calculationofEigenvalues(self, corr__std_matrix, standardized_dataset):
-        eig_vals_std, eig_vecs_std = np.linalg.eig(corr__std_matrix)
-
-        median = self.MedianOfEigenValues(eig_vals_std)
-        new_array = np.vstack([standardized_dataset.columns.values, eig_vals_std])
-        print(new_array)
-        self.findValuesgreaterThanMedian(median, new_array)
-
-    def findValuesgreaterThanMedian(self, median, new_array):
-        print('--------------------------------------------------------------------')
-        print("Features with eigen values > median")
-        for i in range(0, len(new_array[0])):
-            if (new_array[1][i] >= median):
-                print(new_array[0][i])
-
-    def MedianOfEigenValues(self, eig_vals_std):
-        print("Median of eigen values")
-        median = np.median(eig_vals_std)
-        print(median)
-        return median
-
-    def correlation_plot_combined_file(self):
-        print(self.df_add_house_data_file.columns)
-        corr = self.df_add_house_data_file.corr()
-        corr = corr.round(2)
-        print(corr)
-        print(type(corr))
-        # commented to reduce prints
-        ax = sns.heatmap(
-            corr,
-            annot=True,
-            vmin=-1, vmax=1, center=0,
-            cmap=sns.diverging_palette(20, 220, n=200),
-            square=True
-        )
-        plt.show()
-        return corr
 
     def print_ML_errors(self):
         print(self.df_ML_errors)
@@ -466,12 +368,12 @@ class MLModels:
         # plt.legend()
         temp.plot(x='Method',figsize=(20,20))
 
-        plt.show()
+        #plt.show()
 
-    def SVM(self, X_train, X_test, Y_train, Y_test):
+    def SVM(self, X_train, X_test, Y_train, Y_test,colslist):
         print('---------------------------------------------')
         print('SVM Model')
-        svm = LinearSVR(max_iter=10000)
+        svm = LinearSVR(max_iter=100000)
 
         # Train the model using the training sets
         svm.fit(X_train, Y_train)
@@ -488,14 +390,13 @@ class MLModels:
         print('Evaluation of Test Data')
 
         y_test_pred = svm.predict(X_test)
-        self.FindErrors(X_test, Y_test, y_test_pred, 'svm')
+        self.FindErrors(X_test, Y_test, y_test_pred, 'svm',colslist)
         print('---------------------------------------------')
 
     def convert_log_ofPrice(self):
         self.df_add_house_data_file['PRICE']=np.log(self.df_add_house_data_file['PRICE'])
 
     def findpercentCountLog(self, true_value, pred, percent):
-
         true_value = true_value.to_numpy()
         print('converting to inverse standardisation')
         count = 0
@@ -511,6 +412,49 @@ class MLModels:
                 count += 1
             # print(diff)
         return count
+
+    def findingloops(self, X, Y):
+
+        rows = X.shape[0]
+        cols = X.shape[1]
+        listcolumns = X.columns
+        cols1 = []
+        cols2 = []
+        for i in range(0, cols):
+            cols1.append(i)
+            print("i is ", i)
+            print(cols1, " and", cols2)
+            tempX = self.df_add_house_data_file.iloc[0:rows, cols1 + cols2]
+            self.callingMLModels(tempX, Y, listcolumns[cols1 + cols2])
+            print("columns are ", listcolumns[cols1 + cols2])
+            for j in range(i + 1, cols):
+                cols2.append(j)
+                print(cols1, " and", cols2)
+                tempX = self.df_add_house_data_file.iloc[0:rows, cols1 + cols2]
+                self.callingMLModels(tempX, Y, listcolumns[cols1 + cols2])
+                print("columns are ", listcolumns[cols1 + cols2])
+
+            cols1 = []
+            cols2 = []
+        print("Finishing Loop")
+        self.create_ML_Error_csv()
+    def callingMLModels(self,X, Y,colslist):
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
+        list_of_columns = X.columns
+        self.LinearRegression1(X_train, X_test, Y_train, Y_test,list_of_columns,colslist)
+
+        self.XGBoost_Regressor(X_train, X_test, Y_train, Y_test,colslist)
+        self.RandomRegressor(X_train, X_test, Y_train, Y_test,colslist)
+        self.KNN(X_train, X_test, Y_train, Y_test,colslist)
+        #self.SVM(X_train, X_test, Y_train, Y_test,colslist)
+        #self.MLPRegressor(X_train, X_test, Y_train, Y_test,colslist)
+        self.print_ML_errors()
+
+    def create_ML_Error_csv(self):
+        print("copying the dataframe to a new csv file")
+        # print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
+
+        self.df_ML_errors.to_csv(path + "ML Errors with no standardisation.csv", index=False)
 
 
 
@@ -531,8 +475,12 @@ def main():
     X, Y = obj.removePrice()
 
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
-
+    start_time = time.time()
     list_of_columns = X.columns
+    obj.findingloops(X, Y)
+    print("--- %s seconds for running all loops ---" % (time.time() - start_time))
+
+    '''
 
     obj.LinearRegression1(X_train, X_test, Y_train, Y_test, list_of_columns)
     obj.XGBoost_Regressor(X_train, X_test, Y_train, Y_test)
@@ -561,6 +509,7 @@ def main():
 
     obj.print_ML_errors()
     obj.plot_ML_errors()
+    '''
 
 
 if __name__ == '__main__':

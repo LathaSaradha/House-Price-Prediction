@@ -4,12 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import metrics
 import seaborn as sns
+import matplotlib.ticker as ticker
+import math
 
 import statsmodels.api as sm
 import pylab as py
 
 
-sns.set(font_scale=1.0)
+sns.set(font_scale=2.0)
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
@@ -75,28 +77,58 @@ class MLModels:
     def creategraphs(self):
         # Histogram of Beds and Baths and 1p PRICE
         self.df_add_house_data_file['PRICE'].plot.hist()
-        plt.title('Histogram of PRICE')
-        plt.xlabel('PRICE')
-        plt.ylabel('Count')
+        plt.title('Histogram of Price')
+        plt.xlabel('Price of House (Value in Million Dollars)')
+        plt.ylabel('Number of houses')
         #plt.xlim([0, 3*1000000])
 
-       # plt.show()
+        plt.show()
 
         # self.df_add_house_data_file['BATHS'].plot.hist()
-        # plt.title('Histogram of BATHS')
-        # plt.xlabel('BATHS')
-        # plt.ylabel('Count')
+        # plt.title('Histogram of Baths')
+        # plt.xlabel('Number of Baths in a house')
+        # plt.ylabel('Number of Houses')
         # plt.show()
+        #plt.boxplot(self.df_add_house_data_file['BATHS'])
+        ax=sns.boxplot(x=self.df_add_house_data_file['BATHS'], y=self.df_add_house_data_file['PRICE'], data=pd.melt(self.df_add_house_data_file))
+        #plt.xlim(0,20)
+        #plt.xticks(fontsize=10)
+        # for ind, label in enumerate(ax.get_xticklabels()):
+        #     if ind % 2 == 0:  # every 10th label is kept
+        #         label.set_visible(True)
+        #     else:
+        #         label.set_visible(False)
+        # for label in ax.get_xticklabels():
+        #     print(np.int(float(label.get_text())) % 1 != 0)
+        #     print(np.int(float(label.get_text()))%1!=0)
+        #ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
+        #ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
+        plt.title('Distribution of house prices based on number of baths')
+        plt.xlabel('Number of Baths')
+        plt.ylabel('Price of house (Value in Million Dollars)')
+        plt.xticks(fontsize=14)
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
+        plt.show()
         #
         # self.df_add_house_data_file['BEDS'].plot.hist()
-        # plt.title('Histogram of BEDS')
-        # plt.xlabel('BEDS')
-        # plt.ylabel('Count')
+        # plt.title('Histogram of Beds')
+        # plt.xlabel('Number of Baths in a house')
+        # plt.ylabel('Number of Houses')
         # plt.show()
 
-        ax = sns.boxplot(x=self.df_add_house_data_file['BEDS'], y=self.df_add_house_data_file['PRICE'])
-        plt.title('Distribution of house prices based on number of Beds')
-        plt.legend(labels=self.df_add_house_data_file.BEDS.unique())
+        ax = sns.boxplot(x=self.df_add_house_data_file['BEDS'], y=self.df_add_house_data_file['PRICE'],    data=pd.melt(self.df_add_house_data_file))
+        plt.title('Distribution of house prices based on number of beds')
+        plt.xlabel('Number of Beds')
+        plt.ylabel('Price of house (Value in Million Dollars)')
+        #plt.xticks(fontsize=12)
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
+        plt.show()
+
+
+
+        # ax = sns.boxplot(x=self.df_add_house_data_file['BEDS'], y=self.df_add_house_data_file['PRICE'])
+        # plt.title('Distribution of house prices based on number of Beds')
+        # plt.legend(labels=self.df_add_house_data_file.BEDS.unique())
         #plt.show()
 
         print('Default')
@@ -126,9 +158,74 @@ class MLModels:
         print(type(corr))
         '''
 
-        temp=self.df_add_house_data_file
+        # temp=self.df_add_house_data_file
+        #
+        # print(temp.query('BEDS==22'))
 
-        print(temp.query('BEDS==22'))
+        print('Printing correlation ')
+        self.correlation_plot_combined_file()
+
+        print('Graph between Price and CIty ')
+        # ax = sns.boxplot(x=self.df_add_house_data_file['CITY'], y=self.df_add_house_data_file['PRICE'],
+        #                  data=pd.melt(self.df_add_house_data_file))
+        # plt.title('Distribution of house prices based on City')
+        # plt.xlabel('Name of City')
+        # plt.ylabel('Price of house (Value in Million Dollars)')
+        # # plt.xticks(fontsize=12)
+        # ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
+        # plt.show()
+
+        print('Graph of histogram of log of prices')
+        self.df_add_house_data_file['PRICE'] = np.log(self.df_add_house_data_file['PRICE'])
+        self.df_add_house_data_file['PRICE'].plot.hist()
+        plt.title('Histogram of Price')
+        plt.xlabel('Price of House (Value in Million Dollars)')
+        plt.ylabel('Number of houses')
+
+        plt.show()
+        print(5**2)
+
+
+    def correlation_plot_combined_file(self):
+        print(self.df_add_house_data_file.columns)
+        corr = self.df_add_house_data_file.corr()
+        corr = corr.round(2)
+        print(corr)
+        print(type(corr))
+        mask = np.triu(np.ones_like(corr, dtype=np.bool))
+        # commented to reduce prints
+        # sns.set(font_scale=0.5)
+        # ax = sns.heatmap(
+        #     corr,
+        #
+        #     annot=True,
+        #     vmin=-1, vmax=1, center=0,
+        #     cmap=sns.diverging_palette(20, 220, n=200),
+        #     square=True
+        # )
+        # plt.show()
+
+        sns.set(font_scale=0.5)
+        ax=sns.heatmap(
+            corr,
+            mask=mask,
+            annot=True,
+            vmin=-1, vmax=1, center=0,
+            cmap=sns.diverging_palette(220, 10, n=200),
+            square=True,
+            linewidths=.5
+
+        )
+        #plt.figure(figsize=(10, 5))
+        for tick in ax.xaxis.get_major_ticks():
+            tick.label.set_fontsize(6)
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right')
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label.set_fontsize(10)
+        ax.set_title('Correlation of features',fontsize=13)
+
+        plt.show()
+        return corr
 
     def findingloops(self):
         cols1=[1,3,5]
@@ -157,6 +254,29 @@ class MLModels:
             cols1=[]
             cols2=[]
 
+    def findSigmoid(self):
+        # x = np.array(self.df_add_house_data_file['PRICE'], dtype=np.float64)
+        var=-0.5
+        x=np.array([0.1,0.5,1.0,1.5,2.0,2.5,3], dtype=np.float64)
+        # y = np.exp(var * x) / (1 + np.exp(var * x))
+
+        y = np.array(1 / (1 + np.exp(-x)), dtype=np.float64)
+        plt.plot(x, y)
+        plt.xlabel('PRICE')
+        plt.ylabel('Percent')
+        plt.show()
+
+        y1 = np.array(0.3*np.exp(-x), dtype=np.float64)
+        plt.plot(x, y1)
+        plt.xlabel('PRICE')
+        plt.ylabel('Percent')
+        plt.show()
+
+        for row in range(x.shape[0]):
+            print(x[row])
+            y=0.25*math.exp(-x[row])
+            print(y)
+
 
 
 
@@ -169,7 +289,9 @@ def main():
     print("Calling graphs")
     obj.creategraphs()
     print('Finding Loops')
-    obj.findingloops()
+    #obj.findingloops()
+    #print('Finding sigmoid')
+    #obj.findSigmoid()
 
 
 if __name__ == '__main__':

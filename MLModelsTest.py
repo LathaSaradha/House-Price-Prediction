@@ -7,7 +7,7 @@ import seaborn as sns
 import time
 import statsmodels.api as sm
 import pylab as py
-
+import math
 
 sns.set(font_scale=0.5)
 from sklearn.linear_model import LinearRegression
@@ -35,7 +35,7 @@ class MLModels:
         self.df_add_house_data_file = {}
         # self.df_ML_errors={}
         self.df_ML_errors = pd.DataFrame(columns=["Method", "R^2", "Adjusted R^2", "MAE", "MSE", "RMSE","HuberLoss",
-             "logcosh", "Percent_Error" ,"ColsList"        ])
+             "logcosh", "Percent_Error" ,"ColsList"   ,"sigmoid % Error"     ])
 
     def set_dir(self, path):
         try:
@@ -151,8 +151,8 @@ class MLModels:
         # plt.title(title)
         # plt.show()
         acc_linreg = metrics.r2_score(y_value, y_value_pred)
-        adjusted_r2 = 1 - (1 - metrics.r2_score(y_value, y_value_pred)) * (len(y_value) - 1) / (
-                    len(y_value) - x_value.shape[1] - 1)
+        adjusted_r2 = 1 -  ( (1 - (metrics.r2_score(y_value, y_value_pred)**2)) * (len(y_value) - 1) / (
+                    len(y_value) - x_value.shape[1] - 1)  )
         mae = metrics.mean_absolute_error(y_value, y_value_pred)
         mse = metrics.mean_squared_error(y_value, y_value_pred)
         rmse = np.sqrt(metrics.mean_squared_error(y_value, y_value_pred))
@@ -164,11 +164,14 @@ class MLModels:
 
         logcosh=self.logcosh(y_value,y_value_pred)
 
+
         percent = 15
 
         count_of_error_prediction = self.findpercentCount(y_value, y_value_pred, percent)
+        sigmoid_error = self.findpercentCount_Sigmoid(y_value, y_value_pred, percent)
 
         percent_error = count_of_error_prediction / y_value_pred.shape[0]
+        percent__sigmoid_error = sigmoid_error / y_value_pred.shape[0]
 
         print('more than', percent, ' percent error:', percent_error, y_value_pred.shape[0])
 
@@ -181,10 +184,13 @@ class MLModels:
         print('huberLoss:  ' ,huberLoss)
         print('logcosh: ',logcosh)
         print('Accuracy:  %.2f%%' % accuracy)
+        print('Sigmoid Error',percent__sigmoid_error)
 
         self.df_ML_errors = self.df_ML_errors.append(
             {'colslist':colslist,'Method': method, 'R^2': acc_linreg, 'Adjusted R^2': adjusted_r2, 'MAE': mae, 'MSE': mse, 'RMSE': rmse,'Accuracy':accuracy,'HuberLoss':huberLoss,
-             'logcosh':logcosh, 'Percent_Error':percent_error
+             'logcosh':logcosh, 'Percent_Error':percent_error,
+             'sigmoid % Error':percent__sigmoid_error
+
              },
             ignore_index=True)
 
@@ -200,17 +206,7 @@ class MLModels:
 
     def findpercentCount(self, true_value, pred, percent):
         print("Finding percent count")
-        # commented to reduce prints
-        '''
-        print(true_value.shape)
-        print(true_value)
-        print(pred)
-        print(type(true_value))
-        print(type(pred))
 
-        print(type(true_value))
-        print(pred.shape[0])
-        '''
         true_value = true_value.to_numpy()
         print('converting to inverse standardisation')
         count = 0
@@ -226,6 +222,33 @@ class MLModels:
                 count += 1
             # print(diff)
         return count
+
+    def findpercentCount_Sigmoid(self, true_value, pred, percent):
+        print("Finding percent count")
+
+        true_value = true_value.to_numpy()
+        print('converting to inverse standardisation')
+        count = 0
+        for row in range(pred.shape[0]):
+            # print(row)
+            y_truevalue = (true_value[row] * self.std) + self.Mean
+            y_predvalue = (pred[row] * self.std) + self.Mean
+            # print(y_truevalue," ",y_predvalue,"  from ",true_value[row],"  ",pred[row])
+            ytemp=y_truevalue/1000000
+            percent=0.3*(math.exp(-ytemp))
+            #print(y_truevalue," ",percent*100)
+            percent=percent*100
+            percentvalue = (y_truevalue * percent) / 100
+
+            diff = abs(y_truevalue - y_predvalue)
+            if (diff > percentvalue):
+                count += 1
+            # print(diff)
+        return count
+
+
+
+
 
     def histogram_Residuals(self, axis):
         plt.hist(axis)
@@ -488,20 +511,12 @@ class MLModels:
         print('---------------------------------------------')
 
     def findingloops(self,X,Y):
-        # cols1 = [1, 3, 5]
-        # cols2 = [6, 7, 8]
-        # listcolumns = X.columns
-        # #print(self.df_add_house_data_file.shape)
-        #
-        # print(rows)
-        # print(cols)
-        #
-        # temp = X.iloc[0:rows, cols1 + cols2]
-        #print(temp)
-        #print(columns[cols1])
+        print("inside finding loops")
         rows = X.shape[0]
         cols = X.shape[1]
         listcolumns = X.columns
+        print("columns are ")
+        print(listcolumns)
         cols1 = []
         cols2 = []
         for i in range(0, cols):
@@ -527,7 +542,7 @@ class MLModels:
     def callingMLModels(self,X, Y,colslist):
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
         list_of_columns = X.columns
-        self.LinearRegression1(X_train, X_test, Y_train, Y_test, list_of_columns,colslist)
+        self.LinearRegression1(X_train, X_test, Y_train, Y_test,list_of_columns,colslist)
 
         self.XGBoost_Regressor(X_train, X_test, Y_train, Y_test,colslist)
         self.RandomRegressor(X_train, X_test, Y_train, Y_test,colslist)
