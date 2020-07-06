@@ -431,7 +431,6 @@ class MLModels:
         self.call_LinearRegression(Y, colslist, 'setz')
 
 
-
         colslist = ['ZIP_OR_POSTAL_CODE', 'BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE',
                     'CITY numeric', 'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount',
                     'Level_B_SchoolCount',
