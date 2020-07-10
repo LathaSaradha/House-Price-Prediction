@@ -695,7 +695,6 @@ class MLModels:
         self.print_ML_errors()
 
 
-
 def main():
     print("inside Main")
     obj = MLModels()
