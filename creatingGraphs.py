@@ -360,75 +360,66 @@ class MLModels:
         X, Y = self.removePrice()
         rows = X.shape[0]
 
-        colslist = ['YEAR_BUILT']
-        self.call_LinearRegression(Y, colslist, 'set6')
 
-        colslist = ['AGE']
-        self.call_LinearRegression(Y, colslist, 'set7')
 
         colslist = ['Population']
-        self.call_LinearRegression(Y, colslist, 'set12')
+        self.call_LinearRegression(Y, colslist, 'set 1')
 
         colslist = ['ZIP_OR_POSTAL_CODE']
-        self.call_LinearRegression(Y, colslist, 'set8')
+        self.call_LinearRegression(Y, colslist, 'set 2')
 
         colslist = ['Total_Num_ofHospitals']
-        self.call_LinearRegression(Y, colslist, 'set13')
+        self.call_LinearRegression(Y, colslist, 'set 3')
 
         colslist = ['Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount']
-        self.call_LinearRegression(Y, colslist, 'set9')
+        self.call_LinearRegression(Y, colslist, 'set 4')
 
 
 
         colslist = ['BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric']
-        self.call_LinearRegression(Y, colslist, 'set4')
+        self.call_LinearRegression(Y, colslist, 'set 5')
 
         colslist = ['Total_Num_of_Subways']
-        self.call_LinearRegression(Y, colslist, 'setx')
-
-
-
+        self.call_LinearRegression(Y, colslist, 'set 6')
 
 
         colslist = ['Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store']
-        self.call_LinearRegression(Y, colslist, 'set14')
-
-
+        self.call_LinearRegression(Y, colslist, 'set 7')
 
 
         colslist =            ['Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount', 'Level_C_SchoolCount', 'Level_D_SchoolCount',
              'Level_F_SchoolCount', 'Total_Number_of_Schools', 'Num_Complaints_schools', 'Population', 'People/Sq_Mile',
              'Total_Num_ofHospitals']
-        self.call_LinearRegression(Y, colslist, 'set10')
-
+        self.call_LinearRegression(Y, colslist, 'set 8')
 
         colslist =            ['Level_F_SchoolCount', 'Total_Number_of_Schools', 'Num_Complaints_schools', 'Population', 'People/Sq_Mile',
              'Total_Num_ofHospitals', 'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores',
              'min_dist_retail_store']
-        self.call_LinearRegression(Y, colslist, 'set11')
+        self.call_LinearRegression(Y, colslist, 'set 9')
 
         colslist = ['SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
                     'Total_Num_ofComplaints',
                     'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount', 'Level_C_SchoolCount']
-        self.call_LinearRegression(Y, colslist, 'set5')
+        self.call_LinearRegression(Y, colslist, 'set 10')
 
         colslist =['SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric', 'Total_Num_ofComplaints',
                'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount', 'Level_C_SchoolCount',
                'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools', 'Num_Complaints_schools']
 
-        self.call_LinearRegression(Y, colslist, 'seta')
+        self.call_LinearRegression(Y, colslist, 'set 11')
+
+        colslist = ['ZIP_OR_POSTAL_CODE', 'BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE',
+                    'CITY numeric', 'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount']
+
+        self.call_LinearRegression(Y, colslist, 'set 12')
 
         colslist = ['BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
                     'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount',
                     'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
                     'Num_Complaints_schools', 'Population']
 
-        self.call_LinearRegression(Y, colslist, 'sety')
+        self.call_LinearRegression(Y, colslist, 'set 13')
 
-        colslist =['ZIP_OR_POSTAL_CODE', 'BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE',
-               'CITY numeric', 'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount']
-
-        self.call_LinearRegression(Y, colslist, 'setz')
 
 
         colslist = ['ZIP_OR_POSTAL_CODE', 'BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE',
@@ -437,14 +428,14 @@ class MLModels:
                     'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
                     'Num_Complaints_schools', 'Population', 'People/Sq_Mile', 'Total_Num_ofHospitals',
                     'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store']
-        self.call_LinearRegression(Y, colslist, 'set1')
+        self.call_LinearRegression(Y, colslist, 'set 14')
 
         colslist = ['BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
                     'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount',
                     'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
                     'Num_Complaints_schools', 'Population', 'People/Sq_Mile', 'Total_Num_ofHospitals',
                     'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store']
-        self.call_LinearRegression(Y, colslist, 'set2')
+        self.call_LinearRegression(Y, colslist, 'set 15')
 
         colslist = ['BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
                     'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount',
@@ -452,12 +443,10 @@ class MLModels:
                     'Num_Complaints_schools', 'Population', 'People/Sq_Mile', 'Total_Num_ofHospitals',
                     'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store',
                     'Num_of_Retail_stores_Zipcode']
-        self.call_LinearRegression(Y, colslist, 'set3')
+        self.call_LinearRegression(Y, colslist, 'set 16')
 
 
-
-
-        self.plot_ML_errors()
+        self.plot_ML_errors('Linear Regression Sets')
         self.print_ML_errors()
 
     def call_LinearRegression(self, Y, colslist,set):
@@ -466,7 +455,14 @@ class MLModels:
         list_of_columns = X_train.columns
         self.LinearRegression1(X_train, X_test, Y_train, Y_test, list_of_columns, colslist, set)
 
-    def plot_ML_errors(self):
+    def call_RandomForest_Regression(self, Y, colslist,set):
+        tempX = self.df_add_house_data_file[colslist]
+        X_train, X_test, Y_train, Y_test = train_test_split(tempX, Y, test_size=0.2, random_state=4)
+        list_of_columns = X_train.columns
+        self.RandomRegressor(X_train, X_test, Y_train, Y_test, colslist, set)
+
+
+    def plot_ML_errors(self,xlabel):
         print('Plotting errors')
         temp=self.df_ML_errors[["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE","Percent_Error","sigmoid % Error","Accuracy"]].copy()
         temp['R^2']=1-temp['R^2']
@@ -475,9 +471,10 @@ class MLModels:
 
         temp = temp.rename(columns={"R^2": "1- R^2"})
         temp = temp.rename(columns={"Adjusted R^2": "1- Adjusted R^2"})
+        temp = temp.rename(columns={"Accuracy": "1- Accuracy"})
         tempX = self.df_ML_errors['Method']
         plt.plot(tempX, temp)
-        plt.xlabel('Linear Regression Methods',fontsize=14)
+        plt.xlabel(xlabel,fontsize=14)
         plt.ylabel('Performance Metrics',fontsize=14)
         plt.title('Performance Evaluation',fontsize=14)
         params = {'legend.fontsize': 14,
@@ -579,6 +576,124 @@ class MLModels:
             # print(diff)
         return count
 
+    def RandomRegressor(self, X_train, X_test, Y_train, Y_test, colslist,method):
+        print('---------------------------------------------')
+        print('RandomRegressor')
+        reg = RandomForestRegressor()
+
+        # Train the model using the training sets
+        reg.fit(X_train, Y_train)
+        # Commented to reject Train data evaluation
+        '''
+
+        print('Evaluation of Train Data')
+        y_train_pred = reg.predict(X_train)
+
+        self.FindErrors(X_train, Y_train, y_train_pred, 'Random Regressor train')
+        print('---------------------------------------------')
+        '''
+        print('Evaluation of Test Data')
+        y_test_pred = reg.predict(X_test)
+        # commented to reduce prints
+        '''
+        print(Y_test)
+        print(y_test_pred)
+        '''
+
+        self.FindErrors(X_test, Y_test, y_test_pred, method, colslist)
+
+    def creat_Random_forest_graph(self):
+        self.standardise_data()
+        X, Y = self.removePrice()
+        rows = X.shape[0]
+
+        colslist = ['Population']
+        self.call_RandomForest_Regression(Y, colslist, 'set 1')
+
+        colslist = ['ZIP_OR_POSTAL_CODE']
+        self.call_RandomForest_Regression(Y, colslist, 'set 2')
+
+        colslist = ['Total_Num_ofHospitals']
+        self.call_RandomForest_Regression(Y, colslist, 'set 3')
+
+        colslist = ['Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount']
+        self.call_RandomForest_Regression(Y, colslist, 'set 4')
+
+        colslist = ['BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric']
+        self.call_RandomForest_Regression(Y, colslist, 'set 5')
+
+        colslist = ['Total_Num_of_Subways']
+        self.call_RandomForest_Regression(Y, colslist, 'set 6')
+
+        colslist = ['Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store']
+        self.call_RandomForest_Regression(Y, colslist, 'set 7')
+
+        colslist = ['Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount', 'Level_C_SchoolCount',
+                    'Level_D_SchoolCount',
+                    'Level_F_SchoolCount', 'Total_Number_of_Schools', 'Num_Complaints_schools', 'Population',
+                    'People/Sq_Mile',
+                    'Total_Num_ofHospitals']
+        self.call_RandomForest_Regression(Y, colslist, 'set 8')
+
+        colslist = ['Level_F_SchoolCount', 'Total_Number_of_Schools', 'Num_Complaints_schools', 'Population',
+                    'People/Sq_Mile',
+                    'Total_Num_ofHospitals', 'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores',
+                    'min_dist_retail_store']
+        self.call_RandomForest_Regression(Y, colslist, 'set 9')
+
+        colslist = ['SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
+                    'Total_Num_ofComplaints',
+                    'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount', 'Level_C_SchoolCount']
+        self.call_RandomForest_Regression(Y, colslist, 'set 10')
+
+        colslist = ['SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
+                    'Total_Num_ofComplaints',
+                    'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount', 'Level_C_SchoolCount',
+                    'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
+                    'Num_Complaints_schools']
+
+        self.call_RandomForest_Regression(Y, colslist, 'set 11')
+
+        colslist = ['ZIP_OR_POSTAL_CODE', 'BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE',
+                    'AGE',
+                    'CITY numeric', 'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount']
+
+        self.call_RandomForest_Regression(Y, colslist, 'set 12')
+
+        colslist = ['BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
+                    'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount',
+                    'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
+                    'Num_Complaints_schools', 'Population']
+
+        self.call_RandomForest_Regression(Y, colslist, 'set 13')
+
+        colslist = ['ZIP_OR_POSTAL_CODE', 'BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE',
+                    'AGE',
+                    'CITY numeric', 'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount',
+                    'Level_B_SchoolCount',
+                    'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
+                    'Num_Complaints_schools', 'Population', 'People/Sq_Mile', 'Total_Num_ofHospitals',
+                    'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store']
+        self.call_RandomForest_Regression(Y, colslist, 'set 14')
+
+        colslist = ['BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
+                    'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount',
+                    'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
+                    'Num_Complaints_schools', 'Population', 'People/Sq_Mile', 'Total_Num_ofHospitals',
+                    'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store']
+        self.call_RandomForest_Regression(Y, colslist, 'set 15')
+
+        colslist = ['BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
+                    'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount',
+                    'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
+                    'Num_Complaints_schools', 'Population', 'People/Sq_Mile', 'Total_Num_ofHospitals',
+                    'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store',
+                    'Num_of_Retail_stores_Zipcode']
+        self.call_RandomForest_Regression(Y, colslist, 'set 16')
+
+        self.plot_ML_errors('Random Regression Sets')
+        self.print_ML_errors()
+
 
 
 def main():
@@ -594,7 +709,10 @@ def main():
 
     #print('Finding sigmoid')
     #obj.findSigmoid()
-    obj.create_Linear_graph()
+
+    #obj.create_Linear_graph()
+
+    obj.creat_Random_forest_graph()
 
 
 if __name__ == '__main__':

@@ -39,8 +39,8 @@ class MLModels:
     def __init__(self):
         self.df_add_house_data_file = {}
         # self.df_ML_errors={}
-        self.df_ML_errors = pd.DataFrame(columns=["Method", "R^2", "Adjusted R^2", "MAE", "MSE", "RMSE", "HuberLoss",
-                                                  "logcosh", "Percent_Error", "ColsList", "sigmoid % Error","alpha"])
+        self.df_ML_errors = pd.DataFrame(columns=["Method", "R^2", "Adjusted R^2", "MAE", "MSE", "RMSE",
+                                                  "Percent_Error", "ColsList", "sigmoid % Error","alpha"])
 
     def set_dir(self, path):
         try:
@@ -182,9 +182,7 @@ class MLModels:
 
         delta = 1.5
 
-        huberLoss = self.huber(y_value, y_value_pred, delta)
 
-        logcosh = self.logcosh(y_value, y_value_pred)
 
         percent = 15
 
@@ -202,15 +200,14 @@ class MLModels:
         print('MAE:', mae)
         print('MSE:', mse)
         print('RMSE:', rmse)
-        print('huberLoss:  ', huberLoss)
-        print('logcosh: ', logcosh)
+
         print('Accuracy:  %.2f%%' % accuracy)
         print('Sigmoid Error', percent__sigmoid_error)
 
         self.df_ML_errors = self.df_ML_errors.append(
             {'colslist': colslist, 'Method': method, 'R^2': acc_linreg, 'Adjusted R^2': adjusted_r2, 'MAE': mae,
-             'MSE': mse, 'RMSE': rmse, 'Accuracy': accuracy, 'HuberLoss': huberLoss,
-             'logcosh': logcosh, 'Percent_Error': percent_error,
+             'MSE': mse, 'RMSE': rmse, 'Accuracy': accuracy,
+             'Percent_Error': percent_error,
              'sigmoid % Error': percent__sigmoid_error,
              'alpha' :alpha_val
 
@@ -423,147 +420,116 @@ class MLModels:
         #temp.plot(x='Method',figsize=(20,20))
 
         plt.show()
+        temp = self.df_ML_errors[
+            ["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error", "Accuracy","alpha",
+             "Method"]].copy()
+        temp['R^2'] = 1 - temp['R^2']
+        temp['Adjusted R^2'] = 1 - temp['Adjusted R^2']
+        temp['Accuracy'] = 1 - (temp['Accuracy'] / 100)
+
+        temp = temp.rename(columns={"R^2": "1- R^2"})
+        temp = temp.rename(columns={"Adjusted R^2": "1- Adjusted R^2"})
+        temp = temp.rename(columns={"Accuracy": "1- Accuracy"})
 
         print('Plotting Ridge')
 
+        #
+        plt.figure(figsize=(20, 20))
+        plt.suptitle('Performance Evaluation')
+        plt.plot([1, 2, 3, 4])
+
+        plt.subplot(221)
+
+
         type=['Linear Regressor Ridge']
-        temp_Ridge=self.df_ML_errors[self.df_ML_errors.Method.isin(type)]
+        temp_Ridge=temp[temp.Method.isin(type)]
         print(temp_Ridge)
-        temp_Ridge_df= temp_Ridge[["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error","sigmoid % Error"]].copy()
+        temp_Ridge_df= temp_Ridge[["1- R^2", "1- Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error","sigmoid % Error","1- Accuracy"]].copy()
+        temp_Ridge['alpha'] = temp_Ridge['alpha'].astype(str)
+
         tempX_Ridge=temp_Ridge['alpha']
         ax=plt.plot(tempX_Ridge, temp_Ridge_df)
-        plt.xlabel('Linear Regression Ridge',labelpad=3)
-        plt.ylabel('Performance Metrics')
-        plt.title('Performance Evaluation')
+        plt.xlabel('Linear Regression Ridge',fontsize=12)
+        plt.ylabel('Performance Metrics',fontsize=12)
+        #plt.title('Performance Evaluation')
         label=temp_Ridge['alpha']
         plt.xticks(tempX_Ridge,labels=label,fontsize=12)
+        plt.yticks(fontsize=12)
 
-        plt.tick_params(axis='x',length=5,pad=15,labelsize=10)
-        plt.rcParams['xtick.major.pad']='8'
         #self.tick_space(0.50,'major','x')
-
-        plt.show()
-        # plt.axes.set_xticks(tempX_Ridge,minor=True)
-        # plt.axes.set_xlabels(label)
-        # plt.axes.set_xlabels([""] * len(label), minor = True)
-
-        # ax.set_xticks(label)
-        # ax.set_xticks(label, minor=True)
-        # ax.set_xticklabels(label)
-        # ax.set_xticklabels([""] * len(label), minor=True)
-        # fig, ax = plt.subplots()
-        # ax.plot(tempX_Ridge, temp_Ridge_df)
-        # # loc = plticker.MultipleLocator(base=1000)  # this locator puts ticks at regular intervals
-        # # ax.xaxis.set_major_locator(loc)
-        # ax.xaxis.set_ticks(label)
-        # ax.xaxis.set_ticklabels(label)
-        # plt.show()
-
-
-
-
-
-
-        leg = plt.legend()
-        plt.legend(temp.columns)
+        #plt.legend(temp_Ridge_df.columns)
         #plt.show()
 
-
+        plt.subplot(222)
 
         print('plotting  lasso')
         type = ['Linear Regressor Lasso']
-        temp_Ridge = self.df_ML_errors[self.df_ML_errors.Method.isin(type)]
-        print(temp_Ridge)
-        temp_Ridge_df = temp_Ridge[
-            ["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error"]].copy()
-        tempX_Ridge = temp_Ridge['alpha']
-        plt.plot(tempX_Ridge, temp_Ridge_df)
-        plt.xlabel('Linear Regression Lasso')
-        plt.ylabel('Performance Metrics')
-        plt.title('Performance Evaluation')
+
+        temp_Lasso = temp[temp.Method.isin(type)]
+
+        cols = [0,0.5,0.75,1.0,5,10,100,500,1000,10000]
+        temp_Lasso = temp_Lasso[temp_Lasso.alpha.isin(cols)]
+        print(temp_Lasso)
+        temp_Lasso_df = temp_Lasso[
+            ["1- R^2", "1- Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error",
+             "1- Accuracy"]].copy()
+        temp_Lasso['alpha'] = temp_Lasso['alpha'].astype(str)
+        tempX_Lasso = temp_Lasso['alpha']
+        plt.plot(tempX_Lasso, temp_Lasso_df)
+        plt.xlabel('Linear Regression Lasso',fontsize=12)
+        #plt.ylabel('Performance Metrics')
+        #plt.title('Performance Evaluation')
         plt.xticks(fontsize=12)
-        leg = plt.legend()
-        plt.legend(temp.columns)
-        plt.show()
+        plt.yticks(fontsize=12)
+
+        #plt.legend(temp_Lasso_df.columns)
+        #plt.show()
 
         print('plotting positive lasso')
-
+        plt.subplot(223)
         type = ['Linear Regressor Positive Lasso']
-        temp_Ridge = self.df_ML_errors[self.df_ML_errors.Method.isin(type)]
-        print(temp_Ridge)
-        temp_Ridge_df = temp_Ridge[
-            ["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error"]].copy()
-        tempX_Ridge = temp_Ridge['alpha']
-        plt.plot(tempX_Ridge, temp_Ridge_df)
-        plt.xlabel('Linear Regression Positive Lasso')
-        plt.ylabel('Performance Metrics')
-        plt.title('Performance Evaluation')
+        temp_Positive_Lasso = temp[temp.Method.isin(type)]
+
+        cols = [0,0.5,0.75,1.0,5,10,100,500,1000,10000]
+        temp_Positive_Lasso = temp_Positive_Lasso[temp_Positive_Lasso.alpha.isin(cols)]
+        print(temp_Positive_Lasso)
+        temp_Positive_Lasso_df = temp_Positive_Lasso[
+            ["1- R^2", "1- Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error",
+             "1- Accuracy"]].copy()
+        temp_Positive_Lasso['alpha'] = temp_Positive_Lasso['alpha'].astype(str)
+        tempX_Positive_Lasso = temp_Positive_Lasso['alpha']
+        plt.plot(tempX_Positive_Lasso, temp_Positive_Lasso_df)
+        plt.xlabel('Linear Regression Positive Lasso',fontsize=12)
+        plt.ylabel('Performance Metrics',fontsize=12)
+        #plt.title('Performance Evaluation')
         plt.xticks(fontsize=12)
-        leg = plt.legend()
-        plt.legend(temp.columns)
-        plt.show()
+        plt.yticks(fontsize=12)
 
+        #plt.legend(temp_Positive_Lasso_df.columns)
+        #plt.show()
 
+        plt.subplot(224)
         print('plotting Linear Regressor Elastic Net')
         type = ['Linear Regressor Elastic Net']
-        temp_Ridge = self.df_ML_errors[self.df_ML_errors.Method.isin(type)]
-        print(temp_Ridge)
-        temp_Ridge_df = temp_Ridge[
-            ["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error"]].copy()
-        tempX_Ridge = temp_Ridge['alpha']
-        plt.plot(tempX_Ridge, temp_Ridge_df)
-        plt.xlabel('Linear Regressor Elastic Net')
-        plt.ylabel('Performance Metrics')
-        plt.title('Performance Evaluation')
+        temp_Elastic_Net = temp[temp.Method.isin(type)]
+        print(temp_Elastic_Net)
+        temp_Elastic_Net_df = temp_Elastic_Net[
+            ["1- R^2", "1- Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error",
+             "1- Accuracy"]].copy()
+        temp_Elastic_Net['alpha'] = temp_Elastic_Net['alpha'].astype(str)
+        tempX_Elastic_Net= temp_Elastic_Net['alpha']
+        plt.plot(tempX_Elastic_Net, temp_Elastic_Net_df)
+        plt.xlabel('Linear Regressor Elastic Net',fontsize=12)
+        #plt.ylabel('Performance Metrics')
+        #plt.title('Performance Evaluation')
         plt.xticks(fontsize=12)
-        leg = plt.legend()
-        plt.legend(temp.columns)
+        plt.yticks(fontsize=12)
+
+        plt.legend(temp_Elastic_Net_df.columns)
         plt.show()
 
-    def tick_space(self,space, which='major', axis='both'):
-        """
-        Adjust evenly spaced ticks on current axis.
-        Parameters
-        ----------
-        space : float
-            Space between each tick.
-        which : str
-            Can be 'major', 'minor', or 'both'.
-        axis : str
-            Can be 'x', 'y', or 'both'
-        Notes
-        -----
-        Grid visibility and other properties should be set via
-        `matplotlib.pyplot.grid`.
-        """
 
-        ax = plt.gca()
-        if axis in ['x', 'both']:
-            ticks = ax.axes.get_xticks()
-            lim = ax.axes.get_xlim()
-            a = min(min(ticks), min(lim))
-            b = max(max(ticks), max(lim))
-            if which in ['major', 'both']:
-                new_ticks = np.arange(a, b, space)
-                ax.set_xticks(new_ticks)
-                ax.set_xlim(lim)
-            if which in ['minor', 'both']:
-                new_ticks = np.arange(a, b, space)
-                ax.set_xticks(new_ticks, minor=True)
-                ax.set_xlim(lim)
-        if axis in ['y', 'both']:
-            ticks = ax.axes.get_yticks()
-            lim = ax.axes.get_ylim()
-            a = min(min(ticks), min(lim))
-            b = max(max(ticks), max(lim))
-            if which in ['major', 'both']:
-                new_ticks = np.arange(a, b, space)
-                ax.set_yticks(new_ticks)
-                ax.set_ylim(lim)
-            if which in ['minor', 'both']:
-                new_ticks = np.arange(a, b, space)
-                ax.set_yticks(new_ticks, minor=True)
-                ax.set_ylim(lim)
+
 
 
     def findingloops(self, X, Y):
@@ -585,7 +551,7 @@ class MLModels:
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
         list_of_columns = X.columns
 
-        list_ofalpha=[-10,0,0.5,1.0,10,100,500,1000,10000,100000]
+        list_ofalpha=[-10,0,0.5,0.75,1.0,5,10,100,500,1000,10000]
 
 
         self.LinearRegression1(X_train, X_test, Y_train, Y_test, list_of_columns, colslist)

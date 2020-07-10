@@ -567,6 +567,7 @@ class additionalData:
 
         print(self.df_school_safety.shape)
 
+
         print(self.df_school_safety.columns[self.df_school_safety.isna().any()].tolist())
 
     def find_school_safety_for_each_school(self):
