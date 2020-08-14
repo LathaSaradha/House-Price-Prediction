@@ -1,11 +1,19 @@
+'''
+Author : Latha Saradha
+Purpose : This file is used to load all the CSV files which contain the data for the house
+ and create a combined csv file for further calculation.
+'''
+
+
 import os
 import glob
+import pathlib
+
 
 
 import pandas as pd
 
-path = 'C:/Users/Latha/Desktop/LATHA/Northeastern Illinois U/Masters Project/Data/'
-
+path= pathlib.Path()/'Data'
 
 class loadData:
 
@@ -17,11 +25,7 @@ class loadData:
             print("Can't change the Current Working Directory")
 
         print(os.getcwd())
-        if os.path.exists(path) :
-            # Change the current working Directory
-            os.chdir(path)
-        else:
-            print("Can't change the Current Working Directory")
+
 
     def get_files(self):
         txtfiles = []
@@ -30,8 +34,6 @@ class loadData:
         return txtfiles
 
     def load_file(self,all_files):
-        #all_files = glob.glob(os.path.join(path, "*.csv"))  # advisable to use os.path.join as this makes concatenation OS independent
-
         df_from_each_file = (pd.read_csv(f,index_col=False) for f in all_files)
         concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
         print(concatenated_df.shape)
@@ -40,11 +42,12 @@ class loadData:
 
     def create_csv(self,concatenated_df):
         print("copying the dataframe to a new csv file")
-        concatenated_df.to_csv(path+"combined.csv",index=False)
+        concatenated_df.to_csv("combined.csv",index=False)
 
 
 def main():
     print("inside Main")
+    print('path is ',path)
     obj = loadData()
     obj.set_dir(path)
     txt=obj.get_files()

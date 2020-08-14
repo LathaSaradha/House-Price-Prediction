@@ -446,8 +446,8 @@ class MLModels:
         self.XGBoost_Regressor(X_train, X_test, Y_train, Y_test,colslist)
         self.RandomRegressor(X_train, X_test, Y_train, Y_test,colslist)
         self.KNN(X_train, X_test, Y_train, Y_test,colslist)
-        #self.SVM(X_train, X_test, Y_train, Y_test,colslist)
-        #self.MLPRegressor(X_train, X_test, Y_train, Y_test,colslist)
+        self.SVM(X_train, X_test, Y_train, Y_test,colslist)
+        self.MLPRegressor(X_train, X_test, Y_train, Y_test,colslist)
         self.print_ML_errors()
 
     def create_ML_Error_csv(self):

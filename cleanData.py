@@ -1,3 +1,9 @@
+'''
+Author : Latha Saradha
+Purpose : This file is used to load the CSV files which contain the data for the house
+ and perform data preprocessing for the house features.
+'''
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -17,27 +23,9 @@ class cleanData:
         print('Reading', filename)
         self.df_combined_file = (pd.read_csv(path + filename,index_col=False))
 
-        # commented to reduce prints
-        '''
-        print(self.df_combined_file.head())
-        print(self.df_combined_file.shape)
-        '''
-
 
     def identify_columns_with_missing_values(self):
-        # commented to reduce prints
-        '''
-        print(list(self.df_combined_file.columns))
 
-
-
-        #print((self.df_combined_file.columns[self.df_combined_file.isna().any()]).count)
-
-        # Printing those column names where there is atleast one missing value
-        print(dict(self.df_combined_file.isna().any()))
-
-        print('Dimensions before removal are ',self.df_combined_file.shape)
-        '''
         # Find the number of rows with empty values in all columns and dropping those
         self.df_combined_file.dropna(axis=0, how='all',inplace=True)
         print('Dimensions after removal are ',self.df_combined_file.shape)
@@ -58,18 +46,11 @@ class cleanData:
                (list(self.df_combined_file['CITY'].unique()))
                ))
 
-        # commented to reduce prints
-        '''
-        print(self.df_combined_file.describe())
-
-        print(self.df_combined_file.info())
-        '''
 
     def corr_plots_price_lat_long(self):
         corr = self.df_combined_file[['PRICE','LATITUDE','LONGITUDE']].corr()
         print(corr)
-        # commented to reduce prints
-        '''
+        # Heat Map distribution for the Latitude and Longitude with Price.
         ax = sns.heatmap(
             corr,
             annot=True,
@@ -79,21 +60,16 @@ class cleanData:
         )
 
         plt.show()
-        '''
+
 
     def data_price_yearbuilt(self):
         temp_df=self.df_combined_file[['PRICE','YEAR BUILT']]
         temp_df1=temp_df.dropna()
 
-        # commented to reduce prints
-        '''
-        print(temp_df1.head())
-        print(temp_df1.shape)
-        '''
         corr = temp_df1.corr()
         print(corr)
-        # commented to reduce prints
-        '''
+        # Heat Map distribution for the Price and Year Built
+
         ax = sns.heatmap(
             corr,
             annot=True,
@@ -101,9 +77,8 @@ class cleanData:
             cmap=sns.diverging_palette(20, 220, n=200),
             square=True
         )
-
         plt.show()
-        '''
+
 
     def data_price_age(self):
         temp_df = self.df_combined_file[['PRICE', 'YEAR BUILT']]
@@ -116,27 +91,12 @@ class cleanData:
         temp_df1.columns = [column.replace(" ", "_") for column in temp_df1.columns]
         temp_df1=temp_df1.loc[temp_df1['YEAR_BUILT'] <1800.0 , ['YEAR_BUILT']]
 
-        # commented to reduce prints
-        '''
-        print(temp_df1)
-        print(temp_df1.shape)
-        '''
         years=[1060,1055,1500,1025]
         self.df_combined_file.columns = [column.replace(" ", "_") for column in self.df_combined_file.columns]
         print(self.df_combined_file.query('YEAR_BUILT==1060.0'))
 
         # creating additional column to the dataframe
         self.df_combined_file['AGE']=2021-self.df_combined_file['YEAR_BUILT']
-
-        # commented to reduce prints
-        '''
-        print(self.df_combined_file)
-        print(self.df_combined_file.shape)
-        
-        scatter_plot_price_year=self.df_combined_file.plot.scatter(x='YEAR_BUILT',y='PRICE')
-        plt.show()
-        
-        '''
 
         self.df_combined_file = self.df_combined_file[self.df_combined_file.YEAR_BUILT >= 1800.0]
         self.df_combined_file =self.df_combined_file.reset_index(drop=True)

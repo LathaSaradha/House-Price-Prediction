@@ -20,6 +20,7 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neural_network import MLPRegressor
+
 from sklearn.svm import LinearSVR
 from sklearn.naive_bayes import GaussianNB
 
@@ -40,6 +41,8 @@ class MLModels:
 
         self.df_ML_errors = pd.DataFrame(columns=["Method", "R^2", "Adjusted R^2", "MAE", "MSE", "RMSE",
                                             "Percent_Error", "ColsList", "sigmoid % Error"])
+
+        self.df_columnsList=pd.DataFrame(columns=["collist","setNum"])
     def set_dir(self, path):
         try:
             os.chdir(path)
@@ -356,12 +359,23 @@ class MLModels:
         return median
 
     def create_Linear_graph(self):
-        self.standardise_data()
+        #self.standardise_data()
         X, Y = self.removePrice()
         rows = X.shape[0]
+        self.df_ML_errors = self.df_ML_errors.iloc[0:0]
 
+        print('Priniting for checking the error dataframe')
 
+        print(self.df_ML_errors)
 
+        for x in range(self.df_columnsList.shape[0]):
+            colslist = self.df_columnsList['collist'][x]
+            setNum = self.df_columnsList['setNum'][x]
+            print(colslist)
+            print(setNum)
+            self.call_LinearRegression(Y, colslist, setNum)
+
+        '''
         colslist = ['Population']
         self.call_LinearRegression(Y, colslist, 'set 1')
 
@@ -444,6 +458,7 @@ class MLModels:
                     'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store',
                     'Num_of_Retail_stores_Zipcode']
         self.call_LinearRegression(Y, colslist, 'set 16')
+        '''
 
 
         self.plot_ML_errors('Linear Regression Sets')
@@ -462,9 +477,18 @@ class MLModels:
         self.RandomRegressor(X_train, X_test, Y_train, Y_test, colslist, set)
 
 
+    def call_SVM_Regression(self, Y, colslist,set):
+        tempX = self.df_add_house_data_file[colslist]
+        X_train, X_test, Y_train, Y_test = train_test_split(tempX, Y, test_size=0.2, random_state=4)
+        list_of_columns = X_train.columns
+        self.SVM(X_train, X_test, Y_train, Y_test, colslist, set)
+
     def plot_ML_errors(self,xlabel):
         print('Plotting errors')
-        temp=self.df_ML_errors[["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE","Percent_Error","sigmoid % Error","Accuracy"]].copy()
+
+        tempDF=self.df_ML_errors
+
+        temp=tempDF[["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE","Percent_Error","sigmoid % Error","Accuracy"]].copy()
         temp['R^2']=1-temp['R^2']
         temp['Adjusted R^2'] = 1 - temp['Adjusted R^2']
         temp['Accuracy'] = 1- (temp['Accuracy']/100)
@@ -472,7 +496,7 @@ class MLModels:
         temp = temp.rename(columns={"R^2": "1- R^2"})
         temp = temp.rename(columns={"Adjusted R^2": "1- Adjusted R^2"})
         temp = temp.rename(columns={"Accuracy": "1- Accuracy"})
-        tempX = self.df_ML_errors['Method']
+        tempX = tempDF['Method']
         plt.plot(tempX, temp)
         plt.xlabel(xlabel,fontsize=14)
         plt.ylabel('Performance Metrics',fontsize=14)
@@ -513,6 +537,8 @@ class MLModels:
         percent_error = count_of_error_prediction / y_value_pred.shape[0]
         percent__sigmoid_error = sigmoid_error / y_value_pred.shape[0]
 
+        # commented to reduce prints
+
         print('more than', percent, ' percent error:', percent_error, y_value_pred.shape[0])
 
         # f1score=metrics.f1_score(y_value,y_value_pred)
@@ -524,6 +550,7 @@ class MLModels:
 
         print('Accuracy:  %.2f%%' % accuracy)
         print('Sigmoid Error',percent__sigmoid_error)
+
 
         self.df_ML_errors = self.df_ML_errors.append(
             {'colslist':colslist,'Method': method, 'R^2': acc_linreg, 'Adjusted R^2': adjusted_r2, 'MAE': mae, 'MSE': mse, 'RMSE': rmse,
@@ -538,7 +565,7 @@ class MLModels:
         print("Finding percent count")
 
         true_value = true_value.to_numpy()
-        print('converting to inverse standardisation')
+        #print('converting to inverse standardisation')
         count = 0
         for row in range(pred.shape[0]):
             #print(row)
@@ -554,10 +581,10 @@ class MLModels:
         return count
 
     def findpercentCount_Sigmoid(self, true_value, pred, percent):
-        print("Finding percent count")
+        print("Finding sigmoid percent count")
 
         true_value = true_value.to_numpy()
-        print('converting to inverse standardisation')
+        #print('converting to inverse standardisation')
         count = 0
         for row in range(pred.shape[0]):
             # print(row)
@@ -602,11 +629,27 @@ class MLModels:
 
         self.FindErrors(X_test, Y_test, y_test_pred, method, colslist)
 
-    def creat_Random_forest_graph(self):
-        self.standardise_data()
+    def create_Random_forest_graph(self):
+        #self.standardise_data()
         X, Y = self.removePrice()
         rows = X.shape[0]
 
+
+        self.df_ML_errors=self.df_ML_errors.iloc[0:0]
+
+        print('Priniting for checking the error dataframe')
+
+        print(self.df_ML_errors)
+
+
+        for x in range(self.df_columnsList.shape[0]):
+            colslist = self.df_columnsList['collist'][x]
+            setNum =self.df_columnsList['setNum'][x]
+            print(colslist)
+            print(setNum)
+            self.call_RandomForest_Regression(Y,colslist,setNum)
+
+        '''
         colslist = ['Population']
         self.call_RandomForest_Regression(Y, colslist, 'set 1')
 
@@ -690,9 +733,256 @@ class MLModels:
                     'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store',
                     'Num_of_Retail_stores_Zipcode']
         self.call_RandomForest_Regression(Y, colslist, 'set 16')
+        '''
 
         self.plot_ML_errors('Random Regression Sets')
         self.print_ML_errors()
+
+    def create_SVM_graph(self):
+        # self.standardise_data()
+        X, Y = self.removePrice()
+        rows = X.shape[0]
+
+        self.df_ML_errors = self.df_ML_errors.iloc[0:0]
+
+        print('Priniting for checking the error dataframe')
+
+        print(self.df_ML_errors)
+
+        for x in range(self.df_columnsList.shape[0]):
+            colslist = self.df_columnsList['collist'][x]
+            setNum = self.df_columnsList['setNum'][x]
+            print(colslist)
+            print(setNum)
+            self.call_SVM_Regression(Y, colslist, setNum)
+
+        self.plot_ML_errors('SVM Regression Sets')
+        self.print_ML_errors()
+
+    def SVM(self, X_train, X_test, Y_train, Y_test, colslist,method):
+        print('---------------------------------------------')
+        print('SVM Model')
+        svm = LinearSVR(max_iter=10000)
+
+        # Train the model using the training sets
+        svm.fit(X_train, Y_train)
+
+
+        print('---------------------------------------------')
+        print('Evaluation of Test Data')
+
+        y_test_pred = svm.predict(X_test)
+        self.FindErrors(X_test, Y_test, y_test_pred, method, colslist)
+        print('---------------------------------------------')
+
+    def create_XGBoost_graph(self):
+
+        X, Y = self.removePrice()
+        rows = X.shape[0]
+
+        self.df_ML_errors = self.df_ML_errors.iloc[0:0]
+
+        print('Printing for checking the error dataframe')
+
+        print(self.df_ML_errors)
+
+        for x in range(self.df_columnsList.shape[0]):
+            colslist = self.df_columnsList['collist'][x]
+            setNum = self.df_columnsList['setNum'][x]
+            print(colslist)
+            print(setNum)
+            self.call_XGBoost_Regression(Y, colslist, setNum)
+
+        self.plot_ML_errors('XGBoost Regression Sets')
+        self.print_ML_errors()
+
+    def call_XGBoost_Regression(self, Y, colslist,set):
+        tempX = self.df_add_house_data_file[colslist]
+        X_train, X_test, Y_train, Y_test = train_test_split(tempX, Y, test_size=0.2, random_state=4)
+        list_of_columns = X_train.columns
+
+        self.XGBoost_Regressor(X_train, X_test, Y_train, Y_test, colslist, set)
+
+    def KNN(self, X_train, X_test, Y_train, Y_test, colslist,set):
+        print('---------------------------------------------')
+        print('knn')
+        knn = KNeighborsRegressor(n_neighbors=6,weights='distance')
+
+        # Train the model using the training sets
+        knn.fit(X_train, Y_train)
+        # Commented to reject Train data evaluation
+        '''
+
+
+        print('Evaluation of Train Data')
+        y_train_pred = knn.predict(X_train)
+        self.FindErrors(X_train, Y_train, y_train_pred, 'knn train')
+        '''
+        print('---------------------------------------------')
+        print('Evaluation of Test Data')
+
+        y_test_pred = knn.predict(X_test)
+        self.FindErrors(X_test, Y_test, y_test_pred, set, colslist)
+        print('---------------------------------------------')
+
+    def call_MLP_Regression(self, Y, colslist,set):
+        tempX = self.df_add_house_data_file[colslist]
+        X_train, X_test, Y_train, Y_test = train_test_split(tempX, Y, test_size=0.2, random_state=4)
+        list_of_columns = X_train.columns
+        self.MLPRegressor(X_train, X_test, Y_train, Y_test, colslist, set)
+
+
+    def call_KNN_Regression(self, Y, colslist,set):
+        tempX = self.df_add_house_data_file[colslist]
+        X_train, X_test, Y_train, Y_test = train_test_split(tempX, Y, test_size=0.2, random_state=4)
+        list_of_columns = X_train.columns
+        self.KNN(X_train, X_test, Y_train, Y_test, colslist, set)
+
+    def create_KNN_graph(self):
+        # self.standardise_data()
+        X, Y = self.removePrice()
+        rows = X.shape[0]
+
+        self.df_ML_errors = self.df_ML_errors.iloc[0:0]
+
+        print('Priniting for checking the error dataframe')
+
+        print(self.df_ML_errors)
+
+        for x in range(self.df_columnsList.shape[0]):
+            colslist = self.df_columnsList['collist'][x]
+            setNum = self.df_columnsList['setNum'][x]
+            print(colslist)
+            print(setNum)
+            self.call_KNN_Regression(Y, colslist, setNum)
+
+        self.plot_ML_errors('Knn Regression Sets')
+        self.print_ML_errors()
+
+    def create_MLP_graph(self):
+        # self.standardise_data()
+        X, Y = self.removePrice()
+        rows = X.shape[0]
+
+        self.df_ML_errors = self.df_ML_errors.iloc[0:0]
+
+        print('Priniting for checking the error dataframe')
+
+        print(self.df_ML_errors)
+
+        for x in range(self.df_columnsList.shape[0]):
+            colslist = self.df_columnsList['collist'][x]
+            setNum = self.df_columnsList['setNum'][x]
+            print(colslist)
+            print(setNum)
+            self.call_MLP_Regression(Y, colslist, setNum)
+
+        self.plot_ML_errors('MLP Regression Sets')
+        self.print_ML_errors()
+
+
+
+
+    def MLPRegressor(self, X_train, X_test, Y_train, Y_test,colslist,method):
+
+        print('---------------------------------------------')
+        print('MLPRegressor')
+        reg =MLPRegressor(random_state=1, max_iter=500).fit(X_train, Y_train)
+
+        print('---------------------------------------------')
+        print('Evaluation of Test Data')
+        y_test_pred = reg.predict(X_test)
+
+        self.FindErrors(X_test, Y_test, y_test_pred, method,colslist)
+
+        print('score')
+        print(reg.score(X_test, Y_test))
+
+
+    def XGBoost_Regressor(self, X_train, X_test, Y_train, Y_test,colslist,method):
+        print('---------------------------------------------')
+        print('XGBoost_Regressor')
+        reg = XGBRegressor(objective='reg:squarederror',
+                           )
+
+        # Train the model using the training sets
+        reg.fit(X_train, Y_train)
+
+
+        print('---------------------------------------------')
+        print('Evaluation of Test Data')
+
+        y_test_pred = reg.predict(X_test)
+        self.FindErrors(X_test, Y_test, y_test_pred, method,colslist)
+
+
+    def define_ColumnsList(self):
+
+        temp={ 'collist':[ ['Population'],
+                                            ['ZIP_OR_POSTAL_CODE'],
+                                        ['Total_Num_ofHospitals'],
+        ['Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount'],
+         ['BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric'],
+         ['Total_Num_of_Subways'],
+        ['Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store'],
+        ['Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount', 'Level_C_SchoolCount',
+                    'Level_D_SchoolCount',
+                    'Level_F_SchoolCount', 'Total_Number_of_Schools', 'Num_Complaints_schools', 'Population',
+                    'People/Sq_Mile',
+                    'Total_Num_ofHospitals'],
+         ['Level_F_SchoolCount', 'Total_Number_of_Schools', 'Num_Complaints_schools', 'Population',
+                    'People/Sq_Mile',
+                    'Total_Num_ofHospitals', 'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores',
+                    'min_dist_retail_store'],
+        ['SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
+                    'Total_Num_ofComplaints',
+                    'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount', 'Level_C_SchoolCount'],
+        ['SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
+                    'Total_Num_ofComplaints',
+                    'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount', 'Level_C_SchoolCount',
+                    'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
+                    'Num_Complaints_schools'],
+
+        ['ZIP_OR_POSTAL_CODE', 'BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE',
+                    'AGE',
+                    'CITY numeric', 'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount'],
+
+        ['BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
+                    'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount',
+                    'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
+                    'Num_Complaints_schools', 'Population'],
+
+       ['ZIP_OR_POSTAL_CODE', 'BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE',
+                    'AGE',
+                    'CITY numeric', 'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount',
+                    'Level_B_SchoolCount',
+                    'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
+                    'Num_Complaints_schools', 'Population', 'People/Sq_Mile', 'Total_Num_ofHospitals',
+                    'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store'],
+      ['BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
+                    'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount',
+                    'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
+                    'Num_Complaints_schools', 'Population', 'People/Sq_Mile', 'Total_Num_ofHospitals',
+                    'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store'],
+         ['BEDS', 'BATHS', 'SQUARE_FEET', 'YEAR_BUILT', 'LATITUDE', 'LONGITUDE', 'AGE', 'CITY numeric',
+                    'Total_Num_ofComplaints', 'Total_crimes', 'Level_A_SchoolCount', 'Level_B_SchoolCount',
+                    'Level_C_SchoolCount', 'Level_D_SchoolCount', 'Level_F_SchoolCount', 'Total_Number_of_Schools',
+                    'Num_Complaints_schools', 'Population', 'People/Sq_Mile', 'Total_Num_ofHospitals',
+                    'Total_Num_of_Subways', 'min_dist_station', 'Num_of_Retail_stores', 'min_dist_retail_store',
+                    'Num_of_Retail_stores_Zipcode'] ]
+
+                              , 'setNum':['set 1','set 2','set 3','set 4','set 5','set 6',
+                                           'set 7', 'set 8', 'set 9', 'set 10',
+                                          'set 11', 'set 12',
+                                          'set 13', 'set 14', 'set 15', 'set 16'
+
+                                          ]
+                              }
+        self.df_columnsList =pd.DataFrame(temp)
+        print('Defining the columns list')
+
+
+
 
 
 def main():
@@ -702,17 +992,29 @@ def main():
 
     obj.load_combined_data("AdditionalDataAndHouseData.csv")
     print("Calling graphs")
+
+
     obj.creategraphs()
-    print('Finding Loops')
+
+    #print('Finding Loops')
     #obj.findingloops()
 
     #print('Finding sigmoid')
     #obj.findSigmoid()
 
+    #Defining list of columns to be calculated
+    obj.standardise_data()
+    obj.define_ColumnsList()
+
     #obj.create_Linear_graph()
 
-    obj.creat_Random_forest_graph()
+    #obj.create_Random_forest_graph()
 
+    #obj.create_SVM_graph()
 
+    #obj.create_XGBoost_graph()
+
+    obj.create_KNN_graph()
+    #obj.create_MLP_graph()
 if __name__ == '__main__':
     main()
