@@ -51,8 +51,8 @@ def main():
     obj = loadData()
     obj.set_dir(path)
     txt=obj.get_files()
-    print(txt)
-    print()
+    print('Files are ' ,txt)
+
     concatenated_df=obj.load_file(txt)
     obj.create_csv(concatenated_df)
 
