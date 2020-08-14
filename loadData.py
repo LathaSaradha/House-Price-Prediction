@@ -49,7 +49,6 @@ class loadData:
         print("copying the dataframe to a new csv file")
         concatenated_df.to_csv("combined.csv",index=False)
 
-
 def main():
     print("inside Main")
     print('path is ',path)
