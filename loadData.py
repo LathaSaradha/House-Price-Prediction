@@ -61,7 +61,6 @@ def main():
     concatenated_df=obj.load_file(txt)
     obj.create_csv(concatenated_df)
 
-
 if __name__ == '__main__':
     main()
 
