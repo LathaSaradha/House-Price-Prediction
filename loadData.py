@@ -9,8 +9,6 @@ import os
 import glob
 import pathlib
 
-
-
 import pandas as pd
 
 path= pathlib.Path()/'Data'
