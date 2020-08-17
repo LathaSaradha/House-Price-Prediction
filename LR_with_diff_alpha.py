@@ -27,7 +27,7 @@ from sklearn import preprocessing
 
 import pathlib
 
-path= pathlib.Path().absolute()/"Data"
+path= pathlib.Path().absolute()/"Data"/"Additional_Data"
 
 class MLModels:
     pd.set_option('display.max_rows', 500)
@@ -62,7 +62,7 @@ class MLModels:
     # Method to load the data
     def load_combined_data(self, filename):
         print('Reading', filename)
-        self.df_add_house_data_file = (pd.read_csv(path + filename, index_col=False))
+        self.df_add_house_data_file = (pd.read_csv(filename, index_col=False))
 
         self.df_add_house_data_file = self.df_add_house_data_file[~self.df_add_house_data_file.isna()]
 
@@ -75,10 +75,8 @@ class MLModels:
         cols = ['ZIP_OR_POSTAL_CODE', 'CITY', 'Num_of_Retail_stores_Zipcode']
         print(self.df_add_house_data_file[self.df_add_house_data_file["Num_of_Retail_stores_Zipcode"].isnull()][cols])
 
-        # plotting QQ plot
-        data_points = self.df_add_house_data_file[['PRICE']]
 
-        sm.qqplot(data_points, line='45')
+
 
     # Method to call the Linear Regression
     def LinearRegression1(self, X_train, X_test, Y_train, Y_test, list_of_columns, colslist):
@@ -336,15 +334,7 @@ class MLModels:
         corr = corr.round(2)
         print(corr)
         print(type(corr))
-        # commented to reduce prints
-        ax = sns.heatmap(
-            corr,
-            annot=True,
-            vmin=-1, vmax=1, center=0,
-            cmap=sns.diverging_palette(20, 220, n=200),
-            square=True
-        )
-        # plt.show()
+
         return corr
 
     # Method to print ML errors
@@ -365,16 +355,16 @@ class MLModels:
         temp=temp.rename(columns={"Adjusted R^2": "1-Adjusted R^2"})
 
 
-        plt.plot(tempX, temp)
-        plt.xlabel('Linear Regression Methods')
-        plt.ylabel('Performance Metrics')
-        plt.title('Performance Evaluation')
-        plt.xticks(fontsize=12)
-        leg=plt.legend()
-        plt.legend(temp.columns)
+        # #plt.plot(tempX, temp)
+        # plt.xlabel('Linear Regression Methods')
+        # plt.ylabel('Performance Metrics')
+        # plt.title('Performance Evaluation')
+        # plt.xticks(fontsize=12)
+        # leg=plt.legend()
+        #plt.legend(temp.columns)
         #temp.plot(x='Method',figsize=(20,20))
 
-        plt.show()
+
         temp = self.df_ML_errors[
             ["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error", "Accuracy","alpha",
              "Method"]].copy()
@@ -399,9 +389,9 @@ class MLModels:
         temp_Ridge=temp[temp.Method.isin(type)]
         print(temp_Ridge)
         temp_Ridge_df= temp_Ridge[["1- R^2", "1- Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error","sigmoid % Error","1- Accuracy"]].copy()
-        temp_Ridge['alpha'] = temp_Ridge['alpha'].astype(str)
+        #temp_Ridge.['alpha'] = temp_Ridge['alpha'].astype(str)
 
-        tempX_Ridge=temp_Ridge['alpha']
+        tempX_Ridge=temp_Ridge['alpha'].astype(str)
         ax=plt.plot(tempX_Ridge, temp_Ridge_df)
         plt.xlabel('Linear Regression Ridge',fontsize=12)
         plt.ylabel('Performance Metrics',fontsize=12)
@@ -464,7 +454,7 @@ class MLModels:
         temp_Elastic_Net_df = temp_Elastic_Net[
             ["1- R^2", "1- Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error",
              "1- Accuracy"]].copy()
-        temp_Elastic_Net['alpha'] = temp_Elastic_Net['alpha'].astype(str)
+        temp_Elastic_Net.loc[:,'alpha'] = temp_Elastic_Net['alpha'].astype(str)
         tempX_Elastic_Net= temp_Elastic_Net['alpha']
         plt.plot(tempX_Elastic_Net, temp_Elastic_Net_df)
         plt.xlabel('Linear Regressor Elastic Net',fontsize=12)
@@ -492,6 +482,7 @@ class MLModels:
         print("Finishing Loop")
         self.create_ML_Error_csv()
 
+    # Method to call ML models with different alpha
     def callingMLModels(self, X, Y, colslist):
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
         list_of_columns = X.columns
@@ -508,20 +499,14 @@ class MLModels:
             self.LinearRegression_Positive_Lasso(X_train, X_test, Y_train, Y_test, list_of_columns, colslist,i)
             self.LinearRegression_Elastic_Net(X_train, X_test, Y_train, Y_test, list_of_columns, colslist,i)
 
-
-        # self.XGBoost_Regressor(X_train, X_test, Y_train, Y_test, colslist)
-        # self.RandomRegressor(X_train, X_test, Y_train, Y_test, colslist)
-        # self.KNN(X_train, X_test, Y_train, Y_test, colslist)
-        # self.SVM(X_train, X_test, Y_train, Y_test, colslist)
-        # self.MLPRegressor(X_train, X_test, Y_train, Y_test, colslist)
-        # self.print_ML_errors()
-
+    # Method to create ML errors csv file
     def create_ML_Error_csv(self):
         print("copying the dataframe to a new csv file")
         # print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
 
-        self.df_ML_errors.to_csv(path + "ML Errors Linear with alpha.csv", index=False)
+        self.df_ML_errors.to_csv("ML_Errors_Linear_alpha.csv", index=False)
 
+    # Method to call the Linear Regression with Ridge
     def LinearRegression_Ridge(self, X_train, X_test, Y_train, Y_test, list_of_columns, colslist,alpha_val):
         print('---------------------------------------------')
         print('LinearRegression Ridge')
@@ -548,6 +533,7 @@ class MLModels:
         # Model Evaluation
         self.FindErrors(x_test, y_test, y_test_pred, 'Linear Regressor Ridge', colslist,alpha_val)
 
+    # Method to call the Linear Regression with Elastic Net
     def LinearRegression_Elastic_Net(self, X_train, X_test, Y_train, Y_test, list_of_columns, colslist,alpha_val):
         print('---------------------------------------------')
         print('LinearRegression Elastic Net')
@@ -574,6 +560,7 @@ class MLModels:
         # Model Evaluation
         self.FindErrors(x_test, y_test, y_test_pred, 'Linear Regressor Elastic Net', colslist,alpha_val)
 
+    # Method to call the Linear Regression with Positive Lasso
     def LinearRegression_Positive_Lasso(self, X_train, X_test, Y_train, Y_test, list_of_columns, colslist,alpha_val):
         print('---------------------------------------------')
         print('LinearRegression Positive Lasso')
@@ -610,8 +597,6 @@ def main():
 
     # Finding Standardisation
     obj.standardise_data()
-
-
     X, Y = obj.removePrice()
     start_time = time.time()
 

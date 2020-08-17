@@ -354,7 +354,9 @@ class MLModels_with_std:
 
     #  Method to calculate features greater than median for eigen values
     def findValuesgreaterThanMedian(self, median, new_array):
+
         print('--------------------------------------------------------------------')
+
         print("Features with eigen values > median")
         for i in range(0, len(new_array[0])):
             if (new_array[1][i] >= median):
