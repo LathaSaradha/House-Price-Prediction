@@ -244,7 +244,7 @@ class additionalData:
 
         scatter_plot_price_school = plt.scatter(x=X, y=Y)
 
-        plt.show()
+        #plt.show()
 
     # Method to find the correlation between features
     def correlation_plot_combined_file(self):
@@ -262,7 +262,7 @@ class additionalData:
             square=True
         )
 
-        plt.show()
+        #plt.show()
 
     # Method to clean the crime file data and remove unwanted columns
     def clean_crime_file(self):

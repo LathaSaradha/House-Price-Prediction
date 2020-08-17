@@ -113,7 +113,7 @@ class cleanData:
         self.df_combined_file['AGE']=2021-self.df_combined_file['YEAR_BUILT']
 
         self.df_combined_file = self.df_combined_file[self.df_combined_file.YEAR_BUILT >= 1800.0]
-        self.df_combined_file =self.df_combined_file.reset_index(drop=True)
+        #self.df_combined_file =self.df_combined_file.reset_index(drop=True)
 
         temp_df = self.df_combined_file[['PRICE', 'AGE']]
         temp_df1 = temp_df.dropna()
