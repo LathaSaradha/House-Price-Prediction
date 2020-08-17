@@ -1,15 +1,16 @@
 '''
 Author : Latha Saradha
 Purpose : This file is used to load the CSV files which contain the data for the house
- and perform data preprocessing for the house features.
+ and perform data pre-processing for the house features.
 '''
 
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pathlib
+import os
 
-path = 'C:/Users/Latha/Desktop/LATHA/Northeastern Illinois U/Masters Project/Data/'
-
+path= pathlib.Path().absolute()/"Data"
 
 class cleanData:
     pd.set_option('display.max_rows', 500)
@@ -19,10 +20,22 @@ class cleanData:
     def __init__(self):
         df_combined_file = {}
 
+    # Setting the working directory
+    def set_dir(self,path):
+        try:
+            os.chdir(path)
+            print("Directory changed")
+        except OSError:
+            print("Can't change the Current Working Directory")
+
+        print(os.getcwd())
+
+    # Laoding the data file for House
     def loadData(self, filename):
         print('Reading', filename)
-        self.df_combined_file = (pd.read_csv(path + filename,index_col=False))
-
+        print(type(path))
+        print(path)
+        self.df_combined_file = pd.read_csv(filename,index_col=False)
 
     def identify_columns_with_missing_values(self):
 
@@ -58,17 +71,17 @@ class cleanData:
             cmap=sns.diverging_palette(20, 220, n=200),
             square=True
         )
-
+        plt.title('Correlation between Price and Lat/Long')
         plt.show()
 
-
+    # Method to find the Heat Map distribution for the Price and Year Built
     def data_price_yearbuilt(self):
         temp_df=self.df_combined_file[['PRICE','YEAR BUILT']]
         temp_df1=temp_df.dropna()
 
         corr = temp_df1.corr()
         print(corr)
-        # Heat Map distribution for the Price and Year Built
+
 
         ax = sns.heatmap(
             corr,
@@ -77,9 +90,10 @@ class cleanData:
             cmap=sns.diverging_palette(20, 220, n=200),
             square=True
         )
+        plt.title('Correlation between Price and Year Built')
         plt.show()
 
-
+    # Method to convert the year built feature to age for easy calculation.
     def data_price_age(self):
         temp_df = self.df_combined_file[['PRICE', 'YEAR BUILT']]
         temp_df1 = temp_df.dropna()
@@ -104,29 +118,10 @@ class cleanData:
         temp_df = self.df_combined_file[['PRICE', 'AGE']]
         temp_df1 = temp_df.dropna()
 
-        # commented to reduce prints
-        '''
-        print(temp_df1)
-        print(temp_df1.shape)
-        '''
         corr = temp_df1.corr()
         print(corr)
-        # commented to reduce prints
-        '''
-        ax = sns.heatmap(
-            corr,
-            annot=True,
-            vmin=-1, vmax=1, center=0,
-            cmap=sns.diverging_palette(20, 220, n=200),
-            square=True
-        )
 
-        plt.show()
-        
-        print("After removing age related columns")
-        print(self.df_combined_file.describe())
-        '''
-
+    # Method to filter the necessary property types
     def clean_PropertyType(self):
 
         print()
@@ -135,24 +130,12 @@ class cleanData:
         self.df_combined_file = self.df_combined_file [self.df_combined_file.PROPERTY_TYPE.isin(propertyTypes)]
         self.df_combined_file = self.df_combined_file.reset_index(drop=True)
         print(list(self.df_combined_file['PROPERTY_TYPE'].unique()))
-        #commented to reduce prints
-        '''
-        print(self.df_combined_file)
-        print(self.df_combined_file.shape)
-        print(self.df_combined_file.describe())
-        '''
+
 
         propertyTypes_Multi=['Multi-Family (2-4 Unit)', 'Multi-Family (5+ Unit)']
         new_datafram_MultiFamily=self.df_combined_file[self.df_combined_file.PROPERTY_TYPE.isin(propertyTypes_Multi)]
 
-        # commented to reduce prints
-        '''
-        print(new_datafram_MultiFamily)
-        print(new_datafram_MultiFamily.shape)
-        print(list(new_datafram_MultiFamily['PROPERTY_TYPE'].unique()))
-        print(new_datafram_MultiFamily.describe())
-        '''
-
+    # Method to keep the necessary columns and delete the unwanted columns
     def keep_necessary_columns(self):
         print(self.df_combined_file.shape)
         print(self.df_combined_file.columns)
@@ -160,14 +143,7 @@ class cleanData:
         self.df_combined_file=self.df_combined_file.drop(labels=col_to_drop,axis=1)
         self.df_combined_file = self.df_combined_file.reset_index(drop=True)
 
-        # commented to reduce prints
-        '''
-        print(self.df_combined_file.columns)
-        print(self.df_combined_file.shape)
-        print(self.df_combined_file.describe())
-        '''
-        #PRICE, PROPERTY_TYPE, ZIP, BEDS, BATHS, SQUARE_FEET, LOCATION, YEAR_BUILT, URL, LATITUDE, LONGITUDE
-
+    # Method to remove the duplicate records
     def remove_duplicates(self):
         print('Before removing duplicates')
         print(self.df_combined_file.shape)
@@ -176,16 +152,8 @@ class cleanData:
         print('After removing duplicates')
         print(self.df_combined_file.shape)
 
+    # Method to find the BEDS calculation removing rows where there are no value of BEDS
     def beds_Baths(self):
-
-        #to find the BEDS calculation removing rows where there are no value of BEDS
-
-        # commented to reduce prints
-        print()
-        '''
-        print('After checking BEDS')
-        print(list(self.df_combined_file['BEDS'].unique()))
-        '''
 
         self.df_combined_file=self.df_combined_file [~self.df_combined_file.BEDS.isna()]
         print(self.df_combined_file)
@@ -196,26 +164,10 @@ class cleanData:
         self.df_combined_file = self.df_combined_file[~self.df_combined_file.BATHS.isna()]
         self.df_combined_file = self.df_combined_file.reset_index(drop=True)
         print(self.df_combined_file.shape)
-        # commented to reduce prints
-        '''
-        print(self.df_combined_file )
-        print(self.df_combined_file .shape)
-        print(list(self.df_combined_file ['BATHS'].unique()))
-        '''
+
         print(list(self.df_combined_file['BEDS'].unique()))
 
-
-        # commented to reduce prints
-        '''
-     #Histogram of Beds and Baths
-     self.df_combined_file['BEDS'].plot.hist()
-     self.df_combined_file['BATHS'].plot.hist()
-     plt.show()
-    
-    
-     # Printing those column names where there is atleast one missing value
-     print(dict(self.df_combined_file.isna().any()))
-    '''
+    # Method to impute the value for records with no sqft value and fill with the mean value of beds and baths
     def clean_sqft(self):
         # creating a new dataframe with data with valid sqft values;
 
@@ -232,109 +184,64 @@ class cleanData:
         temp_df = new_df_with_sqft_value[['BEDS', 'BATHS','SQUARE_FEET']]
 
         corr = temp_df.corr()
-        # commented to reduce prints
-        '''
-        print(corr)
-
-        print('Unique num of beds in self.df_combined_file')
-        print(list(self.df_combined_file['BEDS'].unique()))
-        print('Unique num of beds in new_df_with_sqft_value')
-        print(list(new_df_with_sqft_value['BEDS'].unique()))
-        print('Unique num of beds in nnew_df_with_sqft_na')
-        print(list(new_df_with_sqft_na['BEDS'].unique()))
-
-        print('Unique num of BATHS in self.df_combined_file')
-        print(list(self.df_combined_file['BATHS'].unique()))
-        print('Unique num of BATHS in new_df_with_sqft_value')
-        print(list(new_df_with_sqft_value['BATHS'].unique()))
-        print('Unique num of BATHS in new_df_with_sqft_na')
-        list1=list(new_df_with_sqft_na['BATHS'].unique())
-        print(list1.sort(reverse=True))
-        '''
-
 
         temp= self.df_combined_file[['BEDS', 'BATHS','SQUARE_FEET']]
 
-        # commented to reduce prints
-        '''
-        print(temp.shape)
-        print(temp)
-        '''
+
         new_temp= self.df_combined_file[['BEDS', 'BATHS','SQUARE_FEET']]
 
         #new_temp['SQUARE_FEET'].fillna(temp.groupby(['BEDS', 'BATHS'])['SQUARE_FEET'].transform('mean'))
         self.df_combined_file['SQUARE_FEET']=temp.groupby(['BEDS', 'BATHS'])['SQUARE_FEET'].transform(lambda x: x.fillna(x.mean()))
 
-        # commented to reduce prints
-        '''
-        print('After changing')
 
-        print(self.df_combined_file.shape)
-        print(self.df_combined_file)
-
-        '''
 
         # Removing rows with sqft is na
         self.df_combined_file = self.df_combined_file[~self.df_combined_file.SQUARE_FEET.isna()]
         self.df_combined_file = self.df_combined_file.reset_index(drop=True)
 
-        # commented to reduce prints
-        '''
-        print('sqft without value')
-        print(self.df_combined_file .shape)
-        print(self.df_combined_file)
-        '''
-
-
+    # Method to remove the records with zip code length other than 5
     def clean_ZipCode(self):
         print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
         print((len(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
                ))
 
 
-        #temp = self.df_combined_file[self.df_combined_file['ZIP_OR_POSTAL_CODE'].isin(options)]
-
         self.df_combined_file= self.df_combined_file[~(self.df_combined_file['ZIP_OR_POSTAL_CODE'].str.len() !=5)]
         self.df_combined_file = self.df_combined_file.reset_index(drop=True)
-        '''
-        print('Zipcdes with no population data')
-        options = ['11690', '10080', '10313', '11351','11380'                 ]
-        temp = self.df_combined_file[self.df_combined_file['ZIP_OR_POSTAL_CODE'].isin(options)]
-        print(temp)
-        print(len(temp))
-        '''
+
         print(self.df_combined_file)
 
+    # Method to create the csv file for cleaned data
     def create_csv(self):
         print("copying the dataframe to a new csv file")
         print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
-        self.df_combined_file.to_csv(path+"cleanedData.csv",index=False)
+        self.df_combined_file.to_csv("cleanedData.csv",index=False)
 
+    # Method to clean the city feature of the dataset
     def clean_City(self):
-        #print(data.dtypes)
-        #print(len(data.CITY.unique()))
+
         self.df_combined_file['CITY'] = self.df_combined_file['CITY'].str.upper()
         self.df_combined_file['CITY'] = self.df_combined_file['CITY'].dropna()
-        #print(data.CITY.unique())
-        self.df_combined_file['CITY numeric'] = self.df_combined_file['CITY'].apply(lambda r: self.findCharacterSum(r))
-        # print(data['new'])
-        #print(len(data['CITY numeric'].unique()))
-        #print(len(data.CITY.unique()))
 
+        self.df_combined_file['CITY numeric'] = self.df_combined_file['CITY'].apply(lambda r: self.findCharacterSum(r))
+
+    # Method to find the character sum of city and convert the city to an equivalent numeric value
     def findCharacterSum(self, s):
         sum = 0
         if (type(s) != str):
             return 0
-        # print(s)
-        # print(len(s))
+
         for j in range(len(s)):
             sum += ord(s[j])
-        # print(sum)
+
         return sum
 
 def main():
     print("inside Main")
+    print('path is ',path)
+
     obj = cleanData()
+    obj.set_dir(path)
     obj.loadData("combined.csv")
     obj.identify_columns_with_missing_values()
     obj.uniqueValues()

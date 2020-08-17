@@ -1,3 +1,10 @@
+'''
+Author : Latha Saradha
+Purpose : This file is a ML Models testing for all the different combination of features and create the CSV File
+ML Models Used : Knn, Linear, SVM, XGBoost, RandomForest
+'''
+
+
 import pandas as pd
 import os
 import numpy as np
@@ -8,6 +15,7 @@ import time
 import statsmodels.api as sm
 import pylab as py
 import math
+import pathlib
 
 sns.set(font_scale=0.5)
 from sklearn.linear_model import LinearRegression
@@ -20,8 +28,8 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.svm import LinearSVR
 from sklearn.naive_bayes import GaussianNB
 
-path = 'C:/Users/Latha/Desktop/LATHA/Northeastern Illinois U/Masters Project/Data/Additional Data/'
 
+path= pathlib.Path().absolute()/"Data"
 
 class MLModels:
     pd.set_option('display.max_rows', 500)
@@ -31,12 +39,15 @@ class MLModels:
               'legend.handlelength': 1}
     plt.rcParams.update(params)
 
+
+
     def __init__(self):
         self.df_add_house_data_file = {}
         # self.df_ML_errors={}
         self.df_ML_errors = pd.DataFrame(columns=["Method", "R^2", "Adjusted R^2", "MAE", "MSE", "RMSE","HuberLoss",
              "logcosh", "Percent_Error" ,"ColsList"   ,"sigmoid % Error"     ])
 
+    # Set the working directory
     def set_dir(self, path):
         try:
             os.chdir(path)
@@ -51,9 +62,11 @@ class MLModels:
         else:
             print("Can't change the Current Working Directory")
 
+
+    #Method to load the combined house and external features data
     def load_combined_data(self, filename):
         print('Reading', filename)
-        self.df_add_house_data_file = (pd.read_csv(path + filename, index_col=False))
+        self.df_add_house_data_file = (pd.read_csv(filename, index_col=False))
 
         self.df_add_house_data_file = self.df_add_house_data_file[~self.df_add_house_data_file.isna()]
 
@@ -72,6 +85,7 @@ class MLModels:
         sm.qqplot(data_points, line='45')
         #py.show()
 
+    # Method to calculate Linear Regression
     def LinearRegression1(self, X_train, X_test, Y_train, Y_test, list_of_columns,colslist):
         print('---------------------------------------------')
         print('LinearRegression1')
@@ -90,14 +104,6 @@ class MLModels:
         print('Intercept', linear_regressor.intercept_)
         print('LScore', linear_regressor.score(x_test, y_test))
 
-        #Commented to reject Train data evaluation
-        '''
-
-        print('Evaluation of Train Data')
-        print('---------------------------------------------')
-        y_pred_train = linear_regressor.predict(x_train)
-        self.FindErrors(x_train, y_train, y_pred_train, 'Linear Regressor Train')
-        '''
 
         print('---------------------------------------------')
         print('Evaluation of Test Data')
@@ -105,28 +111,7 @@ class MLModels:
         # Model Evaluation
         self.FindErrors(x_test, y_test, y_test_pred, 'Linear Regressor',colslist)
 
-        #
-        # plt.figure(figsize=(20, 20))
-        # plt.plot([1, 2, 3])
-        # plt.subplot(221)
-        # plt.scatter(y_test, Y_pred)
-        # plt.xlabel("Prices")
-        # plt.ylabel("Predicted prices")
-        # plt.title("Prices vs Predicted prices")
-        #
-        #
-        # plt.subplot(222)
-        # plt.scatter(Y_pred, y_test - Y_pred)
-        # plt.title("Predicted vs residuals")
-        # plt.xlabel("Predicted")
-        # plt.ylabel("Residuals")
-        #
-        #
-        # # Checking Normality of errors
-        # plt.subplot(223)
-        # self.histogram_Residuals(y_test - Y_pred)
-        # #plt.show()
-
+    # Method to split the data set into two with dependent and independent variables data frame
     def removePrice(self):
         X = self.df_add_house_data_file.drop(['PRICE'], axis=1)
         numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
@@ -142,14 +127,9 @@ class MLModels:
 
         return numericvals, Y
 
+    # Method to calculate the errors
     def FindErrors(self, x_value, y_value, y_value_pred, method,colslist):
 
-        # plt.scatter(y_value, y_value_pred)
-        # plt.xlabel("Prices")
-        # plt.ylabel("Predicted prices")
-        # title="Prices vs Predicted prices - "+method
-        # plt.title(title)
-        # plt.show()
         acc_linreg = metrics.r2_score(y_value, y_value_pred)
         adjusted_r2 = 1 -  ( (1 - (metrics.r2_score(y_value, y_value_pred)**2)) * (len(y_value) - 1) / (
                     len(y_value) - x_value.shape[1] - 1)  )
@@ -194,16 +174,18 @@ class MLModels:
              },
             ignore_index=True)
 
+    # Method to calculate huberloss
     def huber(self,trueValue, pred, delta):
         loss = np.where(np.abs(trueValue - pred) < delta, 0.5 * ((trueValue - pred) ** 2),
                         delta * np.abs(trueValue - pred) - 0.5 * (delta ** 2))
         return np.sum(loss)
 
-    # log cosh loss
+    #  Method to calculate log cosh loss
     def logcosh(self,true_value, pred):
         loss = np.log(np.cosh(pred - true_value))
         return np.sum(loss)
 
+    #  Method to calculate the percent error
     def findpercentCount(self, true_value, pred, percent):
         print("Finding percent count")
 
@@ -223,6 +205,7 @@ class MLModels:
             # print(diff)
         return count
 
+    #  Method to calculate percent count using sigmoid function
     def findpercentCount_Sigmoid(self, true_value, pred, percent):
         print("Finding percent count")
 
@@ -246,81 +229,31 @@ class MLModels:
             # print(diff)
         return count
 
-
-
-
-
+    #  Method to create the histogram residuals
     def histogram_Residuals(self, axis):
         plt.hist(axis)
         plt.title("Histogram of Residuals")
         plt.xlabel("Residuals")
         plt.ylabel("Frequency")
 
+    #  Method to calculate Random Regression Model
     def RandomRegressor(self, X_train, X_test, Y_train, Y_test,colslist):
         print('---------------------------------------------')
         print('RandomRegressor')
         reg = RandomForestRegressor()
 
-
-
         # Train the model using the training sets  
         reg.fit(X_train, Y_train)
-        #Commented to reject Train data evaluation
-        '''
-               
-        print('Evaluation of Train Data')
-        y_train_pred = reg.predict(X_train)
 
-        self.FindErrors(X_train, Y_train, y_train_pred, 'Random Regressor train')
-        print('---------------------------------------------')
-        '''
         print('Evaluation of Test Data')
         y_test_pred = reg.predict(X_test)
-        # commented to reduce prints
-        '''
-        print(Y_test)
-        print(y_test_pred)
-        '''
+
 
         self.FindErrors(X_test, Y_test, y_test_pred, 'Random Regressor',colslist)
 
         print('Confusion matrix ')
-        # temp=metrics.confusion_matrix(Y_test, y_test_pred, labels=None, sample_weight=None, normalize=None)
 
-    # print(temp)
-
-
-    def MLPRegressor(self, X_train, X_test, Y_train, Y_test,colslist):
-        print('---------------------------------------------')
-        print('MLPRegressor')
-        reg =  MLPRegressor(random_state=1, max_iter=500).fit(X_train, Y_train)
-        #Commented to reject Train data evaluation
-        '''
-
-        # Train the model using the training sets
-        reg.fit(X_train, Y_train)
-        print('Evaluation of Train Data')
-        y_train_pred = reg.predict(X_train)
-
-        self.FindErrors(X_train, Y_train, y_train_pred, 'MLPRegressor  train')
-        '''
-        print('---------------------------------------------')
-        print('Evaluation of Test Data')
-        y_test_pred = reg.predict(X_test)
-        # commented to reduce prints
-        '''
-        print(Y_test)
-        print(y_test_pred)
-        '''
-
-        self.FindErrors(X_test, Y_test, y_test_pred, 'MLPRegressor',colslist)
-
-        print('score')
-        print(reg.score(X_test, Y_test))
-
-        print('Confusion matrix ')
-        # temp=metrics.confusion_matrix(Y_test, y_test_pred, labels=None, sample_weight=None, normalize=None)
-
+    #  Method to calculate XGBoost Regression
     def XGBoost_Regressor(self, X_train, X_test, Y_train, Y_test,colslist):
         print('---------------------------------------------')
         print('XGBoost_Regressor')
@@ -330,12 +263,7 @@ class MLModels:
         # Train the model using the training sets
         reg.fit(X_train, Y_train)
 
-        #Commented to reject Train data evaluation
-        '''        
-        print('Evaluation of Train Data')
-        y_train_pred = reg.predict(X_train)
-        self.FindErrors(X_train, Y_train, y_train_pred, 'XGBoost_Regressor train')
-        '''
+
         print('---------------------------------------------')
         print('Evaluation of Test Data')
 
@@ -349,8 +277,7 @@ class MLModels:
         print(feat_importances.nlargest(10))
         feat_importances.nlargest(10).plot(kind='barh')
 
-        #plt.show()
-
+    #  Method to calculate KNN model
     def KNN(self, X_train, X_test, Y_train, Y_test,colslist):
         print('---------------------------------------------')
         print('knn')
@@ -358,14 +285,7 @@ class MLModels:
 
         # Train the model using the training sets
         knn.fit(X_train, Y_train)
-        #Commented to reject Train data evaluation
-        '''
 
-        
-        print('Evaluation of Train Data')
-        y_train_pred = knn.predict(X_train)
-        self.FindErrors(X_train, Y_train, y_train_pred, 'knn train')
-        '''
         print('---------------------------------------------')
         print('Evaluation of Test Data')
 
@@ -373,6 +293,7 @@ class MLModels:
         self.FindErrors(X_test, Y_test, y_test_pred, 'knn',colslist)
         print('---------------------------------------------')
 
+    #  Method to calculate data standardisation
     def standardise_data(self):
 
         numeric = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
@@ -408,11 +329,11 @@ class MLModels:
 
         self.df_add_house_data_file['PRICE'] = Y
 
+    #  Method to calculate standardization
     def FindStandardizedDataset(self, numericvals):
 
         standardized_X = preprocessing.scale(numericvals)
-        # print(standardized_X)
-        # print(standardized_X.dtype)
+
         print(numericvals.columns.values)
 
         self.Mean = numericvals['PRICE'].mean()
@@ -426,6 +347,7 @@ class MLModels:
         print(std)
         return std
 
+    #  Method to calculate Eigen values
     def calculationofEigenvalues(self, corr__std_matrix, standardized_dataset):
         eig_vals_std, eig_vecs_std = np.linalg.eig(corr__std_matrix)
 
@@ -434,6 +356,7 @@ class MLModels:
         print(new_array)
         self.findValuesgreaterThanMedian(median, new_array)
 
+    #  Method to calculate features greater than median for eigen values
     def findValuesgreaterThanMedian(self, median, new_array):
         print('--------------------------------------------------------------------')
         print("Features with eigen values > median")
@@ -441,19 +364,21 @@ class MLModels:
             if (new_array[1][i] >= median):
                 print(new_array[0][i])
 
+    #  Method to calculate the median of eigen values
     def MedianOfEigenValues(self, eig_vals_std):
         print("Median of eigen values")
         median = np.median(eig_vals_std)
         print(median)
         return median
 
+    #  Method to calculate correlation and plot it
     def correlation_plot_combined_file(self):
         print(self.df_add_house_data_file.columns)
         corr = self.df_add_house_data_file.corr()
         corr = corr.round(2)
         print(corr)
         print(type(corr))
-        # commented to reduce prints
+
         ax = sns.heatmap(
             corr,
             annot=True,
@@ -464,10 +389,12 @@ class MLModels:
         #plt.show()
         return corr
 
+    #  Method to print the Errors
     def print_ML_errors(self):
         print(self.df_ML_errors)
         print(self.df_ML_errors.shape)
 
+    #  Method to plot the ML errors
     def plot_ML_errors(self):
         print('Plotting errors')
         temp=self.df_ML_errors[["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE","Percent_Error"]].copy()
@@ -475,16 +402,15 @@ class MLModels:
         temp['MAE'] = 1 - temp['MAE']
         temp['MSE'] = 1 - temp['MSE']
         temp['Percent_Error']=1-temp['Percent_Error']
-        #locs, labels = plt.xticks(ticks=temp['Method'])
+
         tempX=self.df_ML_errors['Method']
         plt.plot(tempX,temp)
         plt.xlabel('Method')
         plt.ylabel('Values')
         plt.title('ML errors')
         plt.legend()
-        #temp.plot(x='Method',figsize=(20,20))
 
-        #plt.show()
+    #  Method to calculate SVM model
 
     def SVM(self, X_train, X_test, Y_train, Y_test,colslist):
         print('---------------------------------------------')
@@ -493,15 +419,6 @@ class MLModels:
 
         # Train the model using the training sets
         svm.fit(X_train, Y_train)
-        #Commented to reject Train data evaluation
-        '''
-
-        
-        print('Evaluation of Train Data')
-        y_train_pred = svm.predict(X_train)
-        self.FindErrors(X_train, Y_train, y_train_pred, 'svm train')
-        '''
-
         print('---------------------------------------------')
         print('Evaluation of Test Data')
 
@@ -509,6 +426,7 @@ class MLModels:
         self.FindErrors(X_test, Y_test, y_test_pred, 'svm',colslist)
         print('---------------------------------------------')
 
+    #  Method to calculate the different loops for different sets
     def findingloops(self,X,Y):
         print("inside finding loops")
         rows = X.shape[0]
@@ -538,24 +456,25 @@ class MLModels:
         self.plot_ML_errors()
         self.create_ML_Error_csv()
 
-
+    #  Method to call ML models
     def callingMLModels(self,X, Y,colslist):
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
         list_of_columns = X.columns
-        self.LinearRegression1(X_train, X_test, Y_train, Y_test,list_of_columns,colslist)
 
+        self.LinearRegression1(X_train, X_test, Y_train, Y_test,list_of_columns,colslist)
         self.XGBoost_Regressor(X_train, X_test, Y_train, Y_test,colslist)
         self.RandomRegressor(X_train, X_test, Y_train, Y_test,colslist)
         self.KNN(X_train, X_test, Y_train, Y_test,colslist)
         self.SVM(X_train, X_test, Y_train, Y_test,colslist)
-        self.MLPRegressor(X_train, X_test, Y_train, Y_test,colslist)
+
         self.print_ML_errors()
 
+    #  Method to create a CSV file with results
     def create_ML_Error_csv(self):
         print("copying the dataframe to a new csv file")
         # print(list(self.df_combined_file['ZIP_OR_POSTAL_CODE'].unique()))
 
-        #self.df_ML_errors.to_csv(path + "ML Errors.csv", index=False)
+        self.df_ML_errors.to_csv("ML Errors.csv", index=False)
 
 
 def main():
@@ -568,9 +487,6 @@ def main():
     # Finding Standardisation
     obj.standardise_data()
 
-    # Finding correlation
-    # print(obj.correlation_plot_combined_file())
-
     X, Y = obj.removePrice()
     start_time = time.time()
 
@@ -578,29 +494,6 @@ def main():
     print("--- %s seconds for running all loops ---" % (time.time() - start_time))
 
     obj.plot_ML_errors()
-    '''
-
-    print("Keeping only necessary columns")
-
-    X = X[['Total_Num_of_Subways', 'BATHS', 'ZIP_OR_POSTAL_CODE', 'SQUARE_FEET', 'LONGITUDE', 'Total_Num_ofHospitals',
-           'Level_A_SchoolCount', 'LATITUDE', 'CITY numeric', 'BEDS']]
-
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
-
-    list_of_columns = X.columns
-    obj.LinearRegression1(X_train, X_test, Y_train, Y_test, list_of_columns)
-    obj.XGBoost_Regressor(X_train, X_test, Y_train, Y_test)
-    obj.RandomRegressor(X_train, X_test, Y_train, Y_test)
-    obj.KNN(X_train, X_test, Y_train, Y_test)
-    obj.SVM(X_train, X_test, Y_train, Y_test)
-    obj.MLPRegressor(X_train, X_test, Y_train, Y_test)
-
-    obj.print_ML_errors()
-    obj.plot_ML_errors()
-    '''
-
-
-
 
 
 if __name__ == '__main__':

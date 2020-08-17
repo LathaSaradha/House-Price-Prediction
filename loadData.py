@@ -11,7 +11,7 @@ import pathlib
 
 import pandas as pd
 
-path= pathlib.Path()/'Data'
+path= pathlib.Path().absolute()/"Data/"
 
 class loadData:
 

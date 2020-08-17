@@ -1,3 +1,9 @@
+'''
+Author : Latha Saradha
+Purpose : This file is to find the ML performance for Linear Regression with different alpha values.
+'''
+
+
 import pandas as pd
 import os
 import numpy as np
@@ -17,16 +23,11 @@ from sklearn.linear_model import Lasso
 from sklearn.linear_model import ElasticNet
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import train_test_split
-from xgboost import XGBRegressor
 from sklearn import preprocessing
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.neural_network import MLPRegressor
-from sklearn.svm import LinearSVR
-from sklearn.naive_bayes import GaussianNB
 
-path = 'C:/Users/Latha/Desktop/LATHA/Northeastern Illinois U/Masters Project/Data/Additional Data/'
+import pathlib
 
+path= pathlib.Path().absolute()/"Data"
 
 class MLModels:
     pd.set_option('display.max_rows', 500)
@@ -42,6 +43,8 @@ class MLModels:
         self.df_ML_errors = pd.DataFrame(columns=["Method", "R^2", "Adjusted R^2", "MAE", "MSE", "RMSE",
                                                   "Percent_Error", "ColsList", "sigmoid % Error","alpha"])
 
+
+    # Method to set directory
     def set_dir(self, path):
         try:
             os.chdir(path)
@@ -56,6 +59,7 @@ class MLModels:
         else:
             print("Can't change the Current Working Directory")
 
+    # Method to load the data
     def load_combined_data(self, filename):
         print('Reading', filename)
         self.df_add_house_data_file = (pd.read_csv(path + filename, index_col=False))
@@ -75,8 +79,8 @@ class MLModels:
         data_points = self.df_add_house_data_file[['PRICE']]
 
         sm.qqplot(data_points, line='45')
-        # py.show()
 
+    # Method to call the Linear Regression
     def LinearRegression1(self, X_train, X_test, Y_train, Y_test, list_of_columns, colslist):
         print('---------------------------------------------')
         print('LinearRegression1')
@@ -95,14 +99,6 @@ class MLModels:
         print('Intercept', linear_regressor.intercept_)
         print('LScore', linear_regressor.score(x_test, y_test))
 
-        # Commented to reject Train data evaluation
-        '''
-
-        print('Evaluation of Train Data')
-        print('---------------------------------------------')
-        y_pred_train = linear_regressor.predict(x_train)
-        self.FindErrors(x_train, y_train, y_pred_train, 'Linear Regressor Train')
-        '''
 
         print('---------------------------------------------')
         print('Evaluation of Test Data')
@@ -111,9 +107,7 @@ class MLModels:
         alpha_val=0
         self.FindErrors(x_test, y_test, y_test_pred, 'Linear Regressor', colslist,alpha_val)
 
-
-
-
+    # Method to call the Linear Regression with Lasso
     def LinearRegression_Lasso(self, X_train, X_test, Y_train, Y_test, list_of_columns, colslist,alpha_val):
         print('---------------------------------------------')
         print('LinearRegression Lasso')
@@ -132,23 +126,13 @@ class MLModels:
         print('Intercept', linear_regressor.intercept_)
         print('LScore', linear_regressor.score(x_test, y_test))
 
-        # Commented to reject Train data evaluation
-        '''
-
-        print('Evaluation of Train Data')
-        print('---------------------------------------------')
-        y_pred_train = linear_regressor.predict(x_train)
-        self.FindErrors(x_train, y_train, y_pred_train, 'Linear Regressor Train')
-        '''
-
         print('---------------------------------------------')
         print('Evaluation of Test Data')
         y_test_pred = linear_regressor.predict(x_test)
         # Model Evaluation
         self.FindErrors(x_test, y_test, y_test_pred, 'Linear Regressor Lasso', colslist,alpha_val)
 
-
-
+    # Method to split the dataset to independent and dependent variables dataframe
     def removePrice(self):
         X = self.df_add_house_data_file.drop(['PRICE'], axis=1)
         numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
@@ -164,14 +148,9 @@ class MLModels:
 
         return numericvals, Y
 
+    # Method to find the errors
     def FindErrors(self, x_value, y_value, y_value_pred, method, colslist,alpha_val):
 
-        # plt.scatter(y_value, y_value_pred)
-        # plt.xlabel("Prices")
-        # plt.ylabel("Predicted prices")
-        # title="Prices vs Predicted prices - "+method
-        # plt.title(title)
-        # plt.show()
         acc_linreg = metrics.r2_score(y_value, y_value_pred)
         adjusted_r2 = 1 - ((1 - (metrics.r2_score(y_value, y_value_pred) ** 2)) * (len(y_value) - 1) / (
                 len(y_value) - x_value.shape[1] - 1))
@@ -181,8 +160,6 @@ class MLModels:
         accuracy = round((acc_linreg * 100.0), 2)
 
         delta = 1.5
-
-
 
         percent = 15
 
@@ -214,16 +191,7 @@ class MLModels:
              },
             ignore_index=True)
 
-    def huber(self, trueValue, pred, delta):
-        loss = np.where(np.abs(trueValue - pred) < delta, 0.5 * ((trueValue - pred) ** 2),
-                        delta * np.abs(trueValue - pred) - 0.5 * (delta ** 2))
-        return np.sum(loss)
-
-    # log cosh loss
-    def logcosh(self, true_value, pred):
-        loss = np.log(np.cosh(pred - true_value))
-        return np.sum(loss)
-
+    # Method to calculate the percentage error
     def findpercentCount(self, true_value, pred, percent):
         print("Finding percent count")
 
@@ -248,31 +216,10 @@ class MLModels:
             if (diff > percentvalue):
                 count += 1
         print(type(y_test))
-        #df_Y_Pred = pd.DataFrame(y_predvalue, columns=['Predicted'])
-        #df_Y_True = pd.DataFrame(y_truevalue, columns=['True_Value'])
 
-        # plt.figure(figsize=(20, 20))
-        # plt.plot([1, 2, 3])
-        # plt.subplot(221)
-        # plt.scatter(y_test, Y_pred)
-        # #plt.plot(df_Y_True, df_Y_Pred)
-        # plt.xlabel("Prices")
-        # plt.ylabel("Predicted prices")
-        # plt.plot(np.unique(y_test), np.poly1d(np.polyfit(y_test, Y_pred, 1))(np.unique(y_test)),color='red')
-        # plt.title("Prices vs Predicted prices -Linear")
-        #
-        #
-        # plt.subplot(222)
-        #
-        # #plt.plot(df_Y_Pred, df_Y_True - df_Y_Pred)
-        # plt.scatter(Y_pred, difference)
-        # plt.title("Predicted vs residuals Linear")
-        # plt.xlabel("Predicted")
-        # plt.ylabel("Residuals")
-        # #plt.show()
-            # print(diff)
         return count
 
+    # Method to calculate the percentage error with sigmoid function
     def findpercentCount_Sigmoid(self, true_value, pred, percent):
         print("Finding percent count")
 
@@ -296,12 +243,14 @@ class MLModels:
             # print(diff)
         return count
 
+    # Method to create the histogram residuals
     def histogram_Residuals(self, axis):
         plt.hist(axis)
         plt.title("Histogram of Residuals")
         plt.xlabel("Residuals")
         plt.ylabel("Frequency")
 
+    # Method to standardize data
 
     def standardise_data(self):
 
@@ -338,11 +287,11 @@ class MLModels:
 
         self.df_add_house_data_file['PRICE'] = Y
 
+    # Method to calculate standardization of data
     def FindStandardizedDataset(self, numericvals):
 
         standardized_X = preprocessing.scale(numericvals)
-        # print(standardized_X)
-        # print(standardized_X.dtype)
+
         print(numericvals.columns.values)
 
         self.Mean = numericvals['PRICE'].mean()
@@ -356,6 +305,7 @@ class MLModels:
         print(std)
         return std
 
+    # Method to calculate Eigen values
     def calculationofEigenvalues(self, corr__std_matrix, standardized_dataset):
         eig_vals_std, eig_vecs_std = np.linalg.eig(corr__std_matrix)
 
@@ -364,6 +314,7 @@ class MLModels:
         print(new_array)
         self.findValuesgreaterThanMedian(median, new_array)
 
+    # Method to calculate Values greater Than Median eigen values
     def findValuesgreaterThanMedian(self, median, new_array):
         print('--------------------------------------------------------------------')
         print("Features with eigen values > median")
@@ -371,12 +322,14 @@ class MLModels:
             if (new_array[1][i] >= median):
                 print(new_array[0][i])
 
+    # Method to calculate median eigen values
     def MedianOfEigenValues(self, eig_vals_std):
         print("Median of eigen values")
         median = np.median(eig_vals_std)
         print(median)
         return median
 
+    # Method to calculate the correlation between features
     def correlation_plot_combined_file(self):
         print(self.df_add_house_data_file.columns)
         corr = self.df_add_house_data_file.corr()
@@ -394,10 +347,12 @@ class MLModels:
         # plt.show()
         return corr
 
+    # Method to print ML errors
     def print_ML_errors(self):
         print(self.df_ML_errors)
         print(self.df_ML_errors.shape)
 
+    # Method to plot ML errors
     def plot_ML_errors(self):
 
         temp = self.df_ML_errors[["R^2", "Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error","sigmoid % Error","alpha"]].copy()
@@ -433,7 +388,6 @@ class MLModels:
 
         print('Plotting Ridge')
 
-        #
         plt.figure(figsize=(20, 20))
         plt.suptitle('Performance Evaluation')
         plt.plot([1, 2, 3, 4])
@@ -456,9 +410,6 @@ class MLModels:
         plt.xticks(tempX_Ridge,labels=label,fontsize=12)
         plt.yticks(fontsize=12)
 
-        #self.tick_space(0.50,'major','x')
-        #plt.legend(temp_Ridge_df.columns)
-        #plt.show()
 
         plt.subplot(222)
 
@@ -477,13 +428,11 @@ class MLModels:
         tempX_Lasso = temp_Lasso['alpha']
         plt.plot(tempX_Lasso, temp_Lasso_df)
         plt.xlabel('Linear Regression Lasso',fontsize=12)
-        #plt.ylabel('Performance Metrics')
-        #plt.title('Performance Evaluation')
+
         plt.xticks(fontsize=12)
         plt.yticks(fontsize=12)
 
-        #plt.legend(temp_Lasso_df.columns)
-        #plt.show()
+
 
         print('plotting positive lasso')
         plt.subplot(223)
@@ -501,12 +450,11 @@ class MLModels:
         plt.plot(tempX_Positive_Lasso, temp_Positive_Lasso_df)
         plt.xlabel('Linear Regression Positive Lasso',fontsize=12)
         plt.ylabel('Performance Metrics',fontsize=12)
-        #plt.title('Performance Evaluation')
+
         plt.xticks(fontsize=12)
         plt.yticks(fontsize=12)
 
-        #plt.legend(temp_Positive_Lasso_df.columns)
-        #plt.show()
+
 
         plt.subplot(224)
         print('plotting Linear Regressor Elastic Net')
@@ -528,10 +476,7 @@ class MLModels:
         plt.legend(temp_Elastic_Net_df.columns)
         plt.show()
 
-
-
-
-
+    # Method to calculate loops
     def findingloops(self, X, Y):
         print("inside finding loops")
         rows = X.shape[0]
@@ -595,14 +540,7 @@ class MLModels:
         print('Intercept', linear_regressor.intercept_)
         print('LScore', linear_regressor.score(x_test, y_test))
 
-        # Commented to reject Train data evaluation
-        '''
 
-        print('Evaluation of Train Data')
-        print('---------------------------------------------')
-        y_pred_train = linear_regressor.predict(x_train)
-        self.FindErrors(x_train, y_train, y_pred_train, 'Linear Regressor Train')
-        '''
 
         print('---------------------------------------------')
         print('Evaluation of Test Data')
@@ -628,14 +566,7 @@ class MLModels:
         print('Intercept', linear_regressor.intercept_)
         print('LScore', linear_regressor.score(x_test, y_test))
 
-        # Commented to reject Train data evaluation
-        '''
 
-        print('Evaluation of Train Data')
-        print('---------------------------------------------')
-        y_pred_train = linear_regressor.predict(x_train)
-        self.FindErrors(x_train, y_train, y_pred_train, 'Linear Regressor Train')
-        '''
 
         print('---------------------------------------------')
         print('Evaluation of Test Data')
@@ -661,14 +592,7 @@ class MLModels:
         print('Intercept', linear_regressor.intercept_)
         print('LScore', linear_regressor.score(x_test, y_test))
 
-        # Commented to reject Train data evaluation
-        '''
 
-        print('Evaluation of Train Data')
-        print('---------------------------------------------')
-        y_pred_train = linear_regressor.predict(x_train)
-        self.FindErrors(x_train, y_train, y_pred_train, 'Linear Regressor Train')
-        '''
 
         print('---------------------------------------------')
         print('Evaluation of Test Data')
@@ -687,8 +611,6 @@ def main():
     # Finding Standardisation
     obj.standardise_data()
 
-    # Finding correlation
-    # print(obj.correlation_plot_combined_file())
 
     X, Y = obj.removePrice()
     start_time = time.time()

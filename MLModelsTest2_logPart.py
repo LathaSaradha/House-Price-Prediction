@@ -377,14 +377,7 @@ class MLModels:
 
         # Train the model using the training sets
         svm.fit(X_train, Y_train)
-        # Commented to reject Train data evaluation
-        '''
 
-
-        print('Evaluation of Train Data')
-        y_train_pred = svm.predict(X_train)
-        self.FindErrors(X_train, Y_train, y_train_pred, 'svm train')
-        '''
 
         print('---------------------------------------------')
         print('Evaluation of Test Data')
