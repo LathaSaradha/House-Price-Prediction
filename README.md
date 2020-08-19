@@ -53,7 +53,7 @@ Output -ML_Errors_Linear_alpha.csv
 7. ###### Graphs.py - 
 This file is used to create Graphs or visual representation of the ML model performance and analysis of data
 
-Run the files in following order
+## Run the files in following order
 
 1. MainFile.py
 2. MLModels_with_std.py
