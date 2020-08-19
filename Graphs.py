@@ -64,7 +64,7 @@ class Graphs:
     # Method to load the combined data
     def load_combined_data(self, filename):
         print('Reading', filename)
-        self.df_add_house_data_file = (pd.read_csv(path + filename, index_col=False))
+        self.df_add_house_data_file = (pd.read_csv( filename, index_col=False))
 
         self.df_add_house_data_file = self.df_add_house_data_file[~self.df_add_house_data_file.isna()]
 
@@ -148,81 +148,7 @@ class Graphs:
         plt.show()
         return corr
 
-    # Method to create loops of different columns
-    def findingloops(self):
-        cols1=[1,3,5]
-        cols2=[6,7,8]
-        columns = self.df_add_house_data_file.columns
-        print(self.df_add_house_data_file.shape)
-        rows=self.df_add_house_data_file.shape[0]
-        cols=self.df_add_house_data_file.shape[1]
-        print(rows)
-        print(cols)
 
-        temp=self.df_add_house_data_file.iloc[0:rows,cols1+cols2]
-        print(temp)
-        print(columns[cols1])
-
-        cols1=[]
-        cols2=[]
-        for i in range(0,cols):
-            cols1.append(i)
-            for j in range(i+1,cols):
-                cols2.append(j)
-
-
-            cols1=[]
-            cols2=[]
-
-        for i in range(0, cols):
-            print('i is ',i)
-            print(cols)
-            data=itertools.combinations(cols,i)
-            subsets = set(data)
-            print(subsets)
-
-    def findingLoopsNew(self):
-        print("inside finding loops")
-        rows = 0
-        cols = 26
-        listcolumns = self.df_add_house_data_file.columns
-        print("columns are ")
-        print(listcolumns)
-        cols1 = []
-        cols2 = []
-
-
-        for i in range(1,cols):
-            print('i is ',i)
-            cc=list(itertools.combinations(listcolumns, i))
-            print(cc)
-            print
-
-        print("Finishing Loop")
-
-    # Method to find the sigmoid function
-    def findSigmoid(self):
-        # x = np.array(self.df_add_house_data_file['PRICE'], dtype=np.float64)
-        var=-0.5
-        x=np.array([0.1,0.5,1.0,1.5,2.0,2.5,3], dtype=np.float64)
-        # y = np.exp(var * x) / (1 + np.exp(var * x))
-
-        y = np.array(1 / (1 + np.exp(-x)), dtype=np.float64)
-        plt.plot(x, y)
-        plt.xlabel('PRICE')
-        plt.ylabel('Percent')
-        plt.show()
-
-        y1 = np.array(0.3*np.exp(-x), dtype=np.float64)
-        plt.plot(x, y1)
-        plt.xlabel('PRICE')
-        plt.ylabel('Percent')
-        plt.show()
-
-        for row in range(x.shape[0]):
-            print(x[row])
-            y=0.25*math.exp(-x[row])
-            print(y)
 
     # Method to split the dataset to dependent and independent variable features
     def removePrice(self):
@@ -736,11 +662,6 @@ def main():
 
     obj.creategraphs()
 
-    print('Finding Loops')
-    obj.findingloops()
-
-    print('Finding sigmoid')
-    obj.findSigmoid()
 
     #Defining list of columns to be calculated
     obj.standardise_data()
