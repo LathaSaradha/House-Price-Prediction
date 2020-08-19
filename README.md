@@ -13,8 +13,9 @@ Follow the steps below for the installation steps.
 2. Clone the code from 
 https://github.com/LathaSaradha/House-Price-Prediction.git
 
-3. Install your choice of IDE
-3. install the following libraries with versions
+3. Install your choice of IDE, Change the setting for python interpreter with the installed path for python.
+
+3. Install the following libraries with versions
 
 matplotlib - 3.2.1
 numpy - 1.18.4
@@ -31,21 +32,21 @@ statsmodel - 0.11.1
 2. cleanData.py -This file is used to load the CSV files which contain the data for the house
  and perform data pre-processing for the house features.
 3. additionalDataFile.py - This file is used to load the CSV files containing additional information around the city and locality of house and cleaning datasets.
+
 4. ###### MainFile.py -  
-This file is a single point of file to call all the loading and
-cleaning of data files and combine the house and external features.
+This file is a single point of file to call all the loading and cleaning of data files and combine the house and external features.
+
 5. ###### MLModels_with_std.py - 
-This file is a ML Models testing for all the different combination of features and create the CSV File
-ML Models Used : Knn, Linear, SVM, XGBoost, RandomForest using standardization
+This file is a ML Models testing for all the different combination of features and create the CSV File ML Models Used : Knn, Linear, SVM, XGBoost, RandomForest using standardization
 Input - AdditionalDataAndHouseData.csv
 Output -ML Errors.csv
 6.  ###### MLModels_without_std.py - 
-This file is a ML Models testing for all the different combination of features and create the CSV File
-ML Models Used : Knn, Linear, SVM, XGBoost, RandomForest without standardization
+This file is a ML Models testing for all the different combination of features and create the CSV File ML Models Used : Knn, Linear, SVM, XGBoost, RandomForest without standardization
 Input - AdditionalDataAndHouseData.csv
 Output -ML_Errors_without_standardisation.csv
 
-6.  ###### LR_with_diff_alpha.py -  This file is to find the ML performance for Linear Regression with different alpha values.
+6.  ###### LR_with_diff_alpha.py -  
+This file is to find the ML performance for Linear Regression with different alpha values.
 Input - AdditionalDataAndHouseData.csv
 Output -ML_Errors_Linear_alpha.csv
 
