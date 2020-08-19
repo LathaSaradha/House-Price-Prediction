@@ -45,8 +45,7 @@ ML Models Used : Knn, Linear, SVM, XGBoost, RandomForest without standardization
 Input - AdditionalDataAndHouseData.csv
 Output -ML_Errors_without_standardisation.csv
 
-6.  ###### LR_with_diff_alpha.py - 
-This file is to find the ML performance for Linear Regression with different alpha values.
+6.  ###### LR_with_diff_alpha.py -  This file is to find the ML performance for Linear Regression with different alpha values.
 Input - AdditionalDataAndHouseData.csv
 Output -ML_Errors_Linear_alpha.csv
 
