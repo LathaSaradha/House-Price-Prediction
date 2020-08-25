@@ -9,9 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import metrics
 import seaborn as sns
-import matplotlib.ticker as ticker
+
 import math
-import itertools
+
 
 sns.set(font_scale=2.0)
 from sklearn.linear_model import LinearRegression
@@ -20,8 +20,6 @@ from xgboost import XGBRegressor
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.neural_network import MLPRegressor
-
 from sklearn.svm import LinearSVR
 import pathlib
 

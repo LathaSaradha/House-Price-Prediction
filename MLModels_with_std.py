@@ -12,8 +12,7 @@ import matplotlib.pyplot as plt
 from sklearn import metrics
 import seaborn as sns
 import time
-import statsmodels.api as sm
-import pylab as py
+
 import math
 import pathlib
 
@@ -24,9 +23,8 @@ from xgboost import XGBRegressor
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.neural_network import MLPRegressor
 from sklearn.svm import LinearSVR
-from sklearn.naive_bayes import GaussianNB
+
 
 
 path= pathlib.Path().absolute()/"Data"/"Additional_Data"
@@ -96,6 +94,7 @@ class MLModels_with_std:
         linear_regressor.fit(x_train, y_train)  # perform linear regression
         Y_pred = linear_regressor.predict(x_test)  # make predictions
         print('---------------------------------------------')
+        '''
         print('Coeff :', linear_regressor.coef_)
         print('Intercept', linear_regressor.intercept_)
         print('LScore', linear_regressor.score(x_test, y_test))
@@ -103,6 +102,7 @@ class MLModels_with_std:
 
         print('---------------------------------------------')
         print('Evaluation of Test Data')
+        '''
         y_test_pred = linear_regressor.predict(x_test)
         # Model Evaluation
         self.FindErrors(x_test, y_test, y_test_pred, 'Linear Regressor',colslist)
@@ -157,8 +157,8 @@ class MLModels_with_std:
         print('MAE:', mae)
         print('MSE:', mse)
         print('RMSE:', rmse)
-        print('huberLoss:  ' ,huberLoss)
-        print('logcosh: ',logcosh)
+        #print('huberLoss:  ' ,huberLoss)
+        #print('logcosh: ',logcosh)
         print('Accuracy:  %.2f%%' % accuracy)
         print('Sigmoid Error',percent__sigmoid_error)
 
@@ -186,7 +186,7 @@ class MLModels_with_std:
         print("Finding percent count")
 
         true_value = true_value.to_numpy()
-        print('converting to inverse standardisation')
+        #print('converting to inverse standardisation')
         count = 0
         for row in range(pred.shape[0]):
             #print(row)
@@ -203,7 +203,7 @@ class MLModels_with_std:
 
     #  Method to calculate percent count using sigmoid function
     def findpercentCount_Sigmoid(self, true_value, pred, percent):
-        print("Finding percent count")
+        #print("Finding percent count")
 
         true_value = true_value.to_numpy()
         print('converting to inverse standardisation')
@@ -241,13 +241,13 @@ class MLModels_with_std:
         # Train the model using the training sets  
         reg.fit(X_train, Y_train)
 
-        print('Evaluation of Test Data')
+        #print('Evaluation of Test Data')
         y_test_pred = reg.predict(X_test)
 
 
         self.FindErrors(X_test, Y_test, y_test_pred, 'Random Regressor',colslist)
 
-        print('Confusion matrix ')
+
 
     #  Method to calculate XGBoost Regression
     def XGBoost_Regressor(self, X_train, X_test, Y_train, Y_test,colslist):
@@ -261,17 +261,12 @@ class MLModels_with_std:
 
 
         print('---------------------------------------------')
-        print('Evaluation of Test Data')
+        #print('Evaluation of Test Data')
 
         y_test_pred = reg.predict(X_test)
         self.FindErrors(X_test, Y_test, y_test_pred, 'XGBoost_Regressor',colslist)
         print('---------------------------------------------')
-        print('Feature Importances')
-        print(reg.feature_importances_)  # use inbuilt class feature_importances of tree based classifiers
-        # plot graph of feature importances for better visualization
-        feat_importances = pd.Series(reg.feature_importances_, index=X_train.columns)
-        print(feat_importances.nlargest(10))
-        feat_importances.nlargest(10).plot(kind='barh')
+
 
     #  Method to calculate KNN model
     def KNN(self, X_train, X_test, Y_train, Y_test,colslist):
@@ -283,7 +278,7 @@ class MLModels_with_std:
         knn.fit(X_train, Y_train)
 
         print('---------------------------------------------')
-        print('Evaluation of Test Data')
+        #print('Evaluation of Test Data')
 
         y_test_pred = knn.predict(X_test)
         self.FindErrors(X_test, Y_test, y_test_pred, 'knn',colslist)
@@ -417,7 +412,7 @@ class MLModels_with_std:
         # Train the model using the training sets
         svm.fit(X_train, Y_train)
         print('---------------------------------------------')
-        print('Evaluation of Test Data')
+        #print('Evaluation of Test Data')
 
         y_test_pred = svm.predict(X_test)
         self.FindErrors(X_test, Y_test, y_test_pred, 'svm',colslist)
@@ -450,6 +445,7 @@ class MLModels_with_std:
             cols1 = []
             cols2 = []
         print("Finishing Loop")
+        self.print_ML_errors()
         self.plot_ML_errors()
         self.create_ML_Error_csv()
 
@@ -462,7 +458,7 @@ class MLModels_with_std:
         self.RandomRegressor(X_train, X_test, Y_train, Y_test,colslist)
         self.KNN(X_train, X_test, Y_train, Y_test,colslist)
         self.SVM(X_train, X_test, Y_train, Y_test,colslist)
-        self.print_ML_errors()
+        #self.print_ML_errors()
 
     #  Method to create a CSV file with results
     def create_ML_Error_csv(self):

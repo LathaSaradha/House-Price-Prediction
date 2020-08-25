@@ -8,10 +8,9 @@ import pathlib
 import os
 import time
 
-from Project.additionalDataFile import additionalData
-from Project.cleanData import cleanData
-from Project.loadData import loadData
-
+from additionalDataFile import additionalData
+from cleanData import cleanData
+from loadData import loadData
 
 path= pathlib.Path().absolute()/"Data/"
 

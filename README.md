@@ -23,8 +23,13 @@ pandas - 1.0.4
 scikit-learn - 0.23.1
 seaborn - 0.10.1
 statsmodel - 0.11.1
+libxgboost - 0.90
 
+5. Choose the python interpreter for the IDE (recommended- python 3.7)
 
+6. Make sure that the necessary libraries are installed.
+
+7. If your python is 3.8, downgrade to python 3.7 using anaconda.
 
 # File Structure
 

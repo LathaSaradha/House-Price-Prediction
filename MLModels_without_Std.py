@@ -14,18 +14,13 @@ from sklearn import metrics
 import seaborn as sns
 import time
 import math
-
 import statsmodels.api as sm
-import pylab as py
-
 sns.set(font_scale=0.5)
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
-from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.neural_network import MLPRegressor
 from sklearn.svm import LinearSVR
 import pathlib
 
@@ -97,19 +92,7 @@ class MLModels_without_std:
         linear_regressor = LinearRegression(fit_intercept=True)  # create object for the class
         linear_regressor.fit(x_train, y_train)  # perform linear regression
         Y_pred = linear_regressor.predict(x_test)  # make predictions
-        print('---------------------------------------------')
-        print('Coeff :', linear_regressor.coef_)
-        print('Intercept', linear_regressor.intercept_)
-        print('LScore', linear_regressor.score(x_test, y_test))
 
-        # Commented to reject Train data evaluation
-        '''
-
-        print('Evaluation of Train Data')
-        print('---------------------------------------------')
-        y_pred_train = linear_regressor.predict(x_train)
-        self.FindErrors(x_train, y_train, y_pred_train, 'Linear Regressor Train')
-        '''
 
         print('---------------------------------------------')
         print('Evaluation of Test Data')
@@ -117,27 +100,7 @@ class MLModels_without_std:
         # Model Evaluation
         self.FindErrors(x_test, y_test, y_test_pred, 'Linear Regressor',colslist)
 
-        #
-        # plt.figure(figsize=(20, 20))
-        # plt.plot([1, 2, 3])
-        # plt.subplot(221)
-        # plt.scatter(y_test, Y_pred)
-        # plt.xlabel("Prices")
-        # plt.ylabel("Predicted prices")
-        # plt.title("Prices vs Predicted prices")
-        #
-        #
-        # plt.subplot(222)
-        # plt.scatter(Y_pred, y_test - Y_pred)
-        # plt.title("Predicted vs residuals")
-        # plt.xlabel("Predicted")
-        # plt.ylabel("Residuals")
-        #
-        #
-        # # Checking Normality of errors
-        # plt.subplot(223)
-        # self.histogram_Residuals(y_test - Y_pred)
-        # #plt.show()
+
 
     # Method to split the dataset into dependent and independent variables dataframe
     def removePrice(self):
@@ -190,8 +153,8 @@ class MLModels_without_std:
         print('MAE:', mae)
         print('MSE:', mse)
         print('RMSE:', rmse)
-        print('huberLoss:  ', huberLoss)
-        print('logcosh: ', logcosh)
+        #print('huberLoss:  ', huberLoss)
+        #print('logcosh: ', logcosh)
         print('Accuracy:  %.2f%%' % accuracy)
         print('Sigmoid Error', percent__sigmoid_error)
 
@@ -221,7 +184,7 @@ class MLModels_without_std:
         print("Finding percent count")
 
         true_value = true_value.to_numpy()
-        print('converting to inverse standardisation')
+        #print('converting to inverse standardisation')
         count = 0
         for row in range(pred.shape[0]):
             # print(row)
@@ -261,7 +224,6 @@ class MLModels_without_std:
 
         self.FindErrors(X_test, Y_test, y_test_pred, 'Random Regressor',colslist)
 
-        print('Confusion matrix ')
 
     # Method to find XG Boost regression Model
     def XGBoost_Regressor(self, X_train, X_test, Y_train, Y_test,colslist):
@@ -279,14 +241,7 @@ class MLModels_without_std:
 
         y_test_pred = reg.predict(X_test)
         self.FindErrors(X_test, Y_test, y_test_pred, 'XGBoost_Regressor',colslist)
-        print('---------------------------------------------')
-        print('Feature Importances')
-        print(reg.feature_importances_)  # use inbuilt class feature_importances of tree based classifiers
-        # plot graph of feature importances for better visualization
-        feat_importances = pd.Series(reg.feature_importances_, index=X_train.columns)
-        print(feat_importances.nlargest(10))
-        feat_importances.nlargest(10).plot(kind='barh')
-        #plt.show()
+
 
     # Method to find Knn Model
     def KNN(self, X_train, X_test, Y_train, Y_test,colslist):
@@ -344,7 +299,7 @@ class MLModels_without_std:
     # Method to find percentage error
     def findpercentCountLog(self, true_value, pred, percent):
         true_value = true_value.to_numpy()
-        print('converting to inverse standardisation')
+        #print('converting to inverse standardisation')
         count = 0
         for row in range(pred.shape[0]):
             # print(row)
@@ -384,6 +339,7 @@ class MLModels_without_std:
             cols1 = []
             cols2 = []
         print("Finishing Loop")
+        self.print_ML_errors()
         self.create_ML_Error_csv()
 
     # Method to call the ML models
@@ -397,7 +353,7 @@ class MLModels_without_std:
         self.KNN(X_train, X_test, Y_train, Y_test,colslist)
         self.SVM(X_train, X_test, Y_train, Y_test,colslist)
 
-        self.print_ML_errors()
+       # self.print_ML_errors()
 
     # Method to create the Error csv file
     def create_ML_Error_csv(self):

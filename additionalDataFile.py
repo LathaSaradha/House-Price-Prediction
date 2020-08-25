@@ -94,7 +94,7 @@ class additionalData:
 
     # Method to find the number of subways available from each house record.
     def find_num_of_subways_for_each_house(self):
-        print('Finding num of subway stations for each house ')
+        print('Finding num of subway stations for each house ........ ')
         self.df_combined_file['Total_Num_of_Subways'] = 0
         self.df_combined_file['min_dist_station'] = 0
 
@@ -102,7 +102,7 @@ class additionalData:
         self.df_combined_file['Total_Num_of_Subways'] = self.df_combined_file[['LATITUDE', 'LONGITUDE']].apply(
             lambda row: self.haversine_np(row[1], row[0], self.df_subway['GTFS_Longitude'].values,
                                           self.df_subway['GTFS_Latitude'].values, 2.0), axis=1)
-        print('After applying')
+
 
         for y in range(self.df_combined_file.shape[0]):
             lat1 = self.df_combined_file['LATITUDE'][y]
@@ -191,7 +191,7 @@ class additionalData:
     # Method to find the school for each house record
     def find_school_for_each_house(self):
 
-        print("Finding the school for each house")
+        print("Finding the school for each house.........")
 
         self.df_combined_school_data['Num_ofComplaints'] = self.df_combined_school_data['Num_ofComplaints'].astype(
             float)
@@ -372,7 +372,7 @@ class additionalData:
 
     # Method to find the number of complaints for each house record
     def find_num_ofComplaints_for_each_house(self):
-        print('Finding num of complaints ')
+        print('Finding num of complaints........... ')
         self.df_combined_file['Total_Num_ofComplaints'] = 0
 
         # Find the number of complaints for each house

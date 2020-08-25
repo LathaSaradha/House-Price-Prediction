@@ -11,11 +11,9 @@ import matplotlib.pyplot as plt
 from sklearn import metrics
 import seaborn as sns
 import time
-import statsmodels.api as sm
-import pylab as py
-import matplotlib.ticker as plticker
+
 import math
-from pandas import DataFrame
+
 
 sns.set(font_scale=1.5)
 from sklearn.linear_model import LinearRegression
@@ -389,7 +387,10 @@ class MLModels:
         temp_Ridge=temp[temp.Method.isin(type)]
         print(temp_Ridge)
         temp_Ridge_df= temp_Ridge[["1- R^2", "1- Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error","sigmoid % Error","1- Accuracy"]].copy()
-        #temp_Ridge.['alpha'] = temp_Ridge['alpha'].astype(str)
+
+        temp_Ridge.loc[:, 'alpha'] = temp_Ridge.loc[:, 'alpha'].astype(str)
+
+        #temp_Ridge.alpha =  temp_Ridge.alpha.astype(str)
 
         tempX_Ridge=temp_Ridge['alpha'].astype(str)
         ax=plt.plot(tempX_Ridge, temp_Ridge_df)
@@ -414,7 +415,9 @@ class MLModels:
         temp_Lasso_df = temp_Lasso[
             ["1- R^2", "1- Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error",
              "1- Accuracy"]].copy()
-        temp_Lasso['alpha'] = temp_Lasso['alpha'].astype(str)
+
+        temp_Lasso.loc[:, 'alpha'] = temp_Lasso.loc[:, 'alpha'].astype(str)
+        #temp_Lasso['alpha'] = temp_Lasso['alpha'].astype(str)
         tempX_Lasso = temp_Lasso['alpha']
         plt.plot(tempX_Lasso, temp_Lasso_df)
         plt.xlabel('Linear Regression Lasso',fontsize=12)
@@ -435,7 +438,8 @@ class MLModels:
         temp_Positive_Lasso_df = temp_Positive_Lasso[
             ["1- R^2", "1- Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error",
              "1- Accuracy"]].copy()
-        temp_Positive_Lasso['alpha'] = temp_Positive_Lasso['alpha'].astype(str)
+        temp_Positive_Lasso.loc[:, 'alpha'] = temp_Positive_Lasso['alpha'].astype(str)
+        #temp_Positive_Lasso['alpha'] = temp_Positive_Lasso['alpha'].astype(str)
         tempX_Positive_Lasso = temp_Positive_Lasso['alpha']
         plt.plot(tempX_Positive_Lasso, temp_Positive_Lasso_df)
         plt.xlabel('Linear Regression Positive Lasso',fontsize=12)
@@ -454,6 +458,8 @@ class MLModels:
         temp_Elastic_Net_df = temp_Elastic_Net[
             ["1- R^2", "1- Adjusted R^2", "MAE", "MSE", "RMSE", "Percent_Error", "sigmoid % Error",
              "1- Accuracy"]].copy()
+
+
         temp_Elastic_Net.loc[:,'alpha'] = temp_Elastic_Net['alpha'].astype(str)
         tempX_Elastic_Net= temp_Elastic_Net['alpha']
         plt.plot(tempX_Elastic_Net, temp_Elastic_Net_df)
